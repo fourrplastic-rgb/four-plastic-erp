@@ -59,10 +59,24 @@ from routes.bank_statement_routes import bank_statement_bp
 
 # Import TALLY PARSER blueprint
 from routes.tally_parser_routes import tally_parser_bp
+from supabase_sync import download_db, upload_db
 
 app = Flask(__name__, 
             static_folder='../frontend/out',  # For production build
             static_url_path='')
+
+# Download the database from Supabase Storage on startup
+download_db()
+
+@app.after_request
+def after_request_callback(response):
+    # Upload local database changes back to the cloud after successful write actions
+    if request.method in ['POST', 'PUT', 'DELETE', 'PATCH'] and response.status_code < 400:
+        try:
+            upload_db()
+        except Exception as e:
+            print(f"⚠️ Failed to auto-upload database changes: {e}")
+    return response
 
 # Disable strict slashes globally to prevent 308 redirects that strip Authorization headers
 app.url_map.strict_slashes = False
