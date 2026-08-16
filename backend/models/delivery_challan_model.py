@@ -150,7 +150,7 @@ class DeliveryChallan:
     
     @staticmethod
     def get_all():
-        """Get all delivery challans"""
+        """Get all delivery challans with items"""
         try:
             with get_db_connection() as conn:
                 cursor = conn.cursor()
@@ -162,6 +162,21 @@ class DeliveryChallan:
                     ORDER BY dc.id DESC
                 ''')
                 challans = [dict_from_row(row) for row in cursor.fetchall()]
+                
+                # Fetch all items for these challans to avoid N+1 query loops
+                if challans:
+                    cursor.execute('SELECT * FROM delivery_challan_items')
+                    items_rows = cursor.fetchall()
+                    
+                    from collections import defaultdict
+                    items_by_challan = defaultdict(list)
+                    for item in items_rows:
+                        item_dict = dict_from_row(item)
+                        items_by_challan[item_dict['challan_id']].append(item_dict)
+                    
+                    for dc in challans:
+                        dc['items'] = items_by_challan[dc['id']]
+                
                 return challans
         except Exception as e:
             print(f"Error fetching challans: {e}")

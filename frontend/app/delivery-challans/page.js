@@ -105,22 +105,26 @@ export default function DeliveryChallansPage() {
       
       let challansData = response.data
       
-      // Fetch each challan with its items
+      // Fetch each challan with its items if not already attached by the backend
       console.log('Fetching complete details for each challan...')
       for (let i = 0; i < challansData.length; i++) {
-        try {
-          const challanDetail = await axios.get(`${API_BASE_URL}/delivery-challans/${challansData[i].id}`)
-          challansData[i].items = challanDetail.data.items || []
-          console.log(`Challan ${challansData[i].id}: ${challansData[i].items.length} items found`)
-          
-          if (challansData[i].items.length > 0) {
-            challansData[i].items.forEach((item, idx) => {
-              console.log(`  Item ${idx + 1}: ${item.item_name || item.name}, Qty: ${item.qty || item.quantity}`)
-            })
+        if (!challansData[i].items || !Array.isArray(challansData[i].items)) {
+          try {
+            const challanDetail = await axios.get(`${API_BASE_URL}/delivery-challans/${challansData[i].id}`)
+            challansData[i].items = challanDetail.data.items || []
+            console.log(`Challan ${challansData[i].id}: ${challansData[i].items.length} items found`)
+            
+            if (challansData[i].items.length > 0) {
+              challansData[i].items.forEach((item, idx) => {
+                console.log(`  Item ${idx + 1}: ${item.item_name || item.name}, Qty: ${item.qty || item.quantity}`)
+              })
+            }
+          } catch (itemError) {
+            console.error(`Could not fetch details for challan ${challansData[i].id}:`, itemError.message)
+            challansData[i].items = []
           }
-        } catch (itemError) {
-          console.error(`Could not fetch details for challan ${challansData[i].id}:`, itemError.message)
-          challansData[i].items = []
+        } else {
+          console.log(`Challan ${challansData[i].id}: items already pre-loaded by backend`)
         }
       }
       
