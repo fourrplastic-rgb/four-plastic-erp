@@ -23,4 +23,4 @@ services:
     startCommand: cd frontend && npm run start
     envVars:
       - key: NEXT_PUBLIC_API_URL
-        value: https://four-plastic-backend.onrender.com
+        value: https://charging-tips-stack-benz.trycloudflare.com
