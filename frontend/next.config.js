@@ -12,14 +12,15 @@ const nextConfig = {
   },
 
   async rewrites() {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:5001/api/:path*' // Proxy to Backend
+        destination: `${backendUrl}/api/:path*` // Proxy to Backend
       },
       {
         source: '/uploads/:path*',
-        destination: 'http://localhost:5001/uploads/:path*' // Proxy to Backend uploads
+        destination: `${backendUrl}/uploads/:path*` // Proxy to Backend uploads
       }
     ]
   }
