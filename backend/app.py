@@ -59,7 +59,7 @@ from routes.bank_statement_routes import bank_statement_bp
 
 # Import TALLY PARSER blueprint
 from routes.tally_parser_routes import tally_parser_bp
-from supabase_sync import download_db, upload_db
+from supabase_sync import download_db, upload_db_async
 
 app = Flask(__name__, 
             static_folder='../frontend/out',  # For production build
@@ -70,10 +70,10 @@ download_db()
 
 @app.after_request
 def after_request_callback(response):
-    # Upload local database changes back to the cloud after successful write actions
+    # Upload local database changes back to the cloud asynchronously in a background thread
     if request.method in ['POST', 'PUT', 'DELETE', 'PATCH'] and response.status_code < 400:
         try:
-            upload_db()
+            upload_db_async()
         except Exception as e:
             print(f"⚠️ Failed to auto-upload database changes: {e}")
     return response

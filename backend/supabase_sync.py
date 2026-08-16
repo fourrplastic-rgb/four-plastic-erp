@@ -77,3 +77,11 @@ def upload_db():
     except Exception as e:
         print(f"❌ Failed to upload database to Supabase storage: {e}")
         return False
+
+import threading
+
+def upload_db_async():
+    """Uploads the manufacturing.db to Supabase in a background thread to prevent blocking requests"""
+    thread = threading.Thread(target=upload_db)
+    thread.daemon = True
+    thread.start()
