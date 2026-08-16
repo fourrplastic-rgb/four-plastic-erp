@@ -1,0 +1,11 @@
+node_modules/
+venv/
+.next/
+.env
+*.log
+__pycache__/
+.DS_Store
+*.db
+*.sqlite
+backups/
+backup.tar.gz

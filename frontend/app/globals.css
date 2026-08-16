@@ -1,0 +1,790 @@
+@import "tailwindcss";
+
+:root, .theme-lavender {
+  /* Velvet Lavender - Light Glassmorphic Theme */
+  --background: #eef0f6;
+  --foreground: #1e293b;
+  
+  --color-p1: #a5b4fc; /* pink-300 -> indigo-300 */
+  --color-p2: #818cf8; /* pink-400 -> indigo-400 */
+  --color-p3: #6366f1; /* pink-500 -> indigo-500 */
+  --color-p4: #4f46e5; /* pink-600 -> indigo-600 */
+  
+  --color-g1: #10b981; /* green-500 -> emerald-500 */
+  --color-g2: #059669; /* green-600 -> emerald-600 */
+  
+  --color-e1: #10b981;
+  --color-e2: #059669;
+  
+  --color-b1: #3b82f6; /* blue-400 -> blue-500 */
+  --color-b2: #2563eb; /* blue-500 -> blue-600 */
+  
+  --color-s1: #3b82f6;
+  --color-s2: #2563eb;
+  
+  --color-v1: #ec4899; /* purple-400 -> pink-500 */
+  --color-v2: #db2777; /* purple-500 -> pink-600 */
+  
+  /* Ambient Orbs */
+  --orb-1: rgba(99, 102, 241, 0.12); 
+  --orb-2: rgba(236, 72, 153, 0.08); 
+  --orb-3: rgba(14, 165, 233, 0.08); 
+  
+  /* Grid Color */
+  --grid-color: rgba(99, 102, 241, 0.05);
+
+  /* Unified Design Tokens */
+  --theme-primary: #6366f1;
+  --theme-primary-glow: rgba(99, 102, 241, 0.15);
+  --theme-secondary: #4f46e5;
+  --theme-secondary-glow: rgba(79, 70, 229, 0.15);
+  --card-border: rgba(99, 102, 241, 0.12);
+  --card-background: rgba(255, 255, 255, 0.75);
+
+  /* Adaptive Design Tokens */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --input-bg: rgba(255, 255, 255, 0.85);
+  --input-border: rgba(15, 23, 42, 0.12);
+  --input-text: #1e293b;
+  --table-border: rgba(15, 23, 42, 0.06);
+  --table-row-hover: rgba(99, 102, 241, 0.04);
+}
+
+.theme-day {
+  /* Sunlight Day - High Contrast Light Theme */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  
+  --color-p1: #93c5fd; /* pink-300 -> blue-300 */
+  --color-p2: #60a5fa; /* pink-400 -> blue-400 */
+  --color-p3: #2563eb; /* pink-500 -> blue-600 */
+  --color-p4: #1d4ed8; /* pink-600 -> blue-700 */
+  
+  --color-g1: #10b981; /* green-500 -> emerald-500 */
+  --color-g2: #059669; /* green-600 -> emerald-600 */
+  
+  --color-e1: #10b981;
+  --color-e2: #059669;
+  
+  --color-b1: #0284c7; /* blue-400 -> sky-600 */
+  --color-b2: #0369a1; /* blue-500 -> sky-700 */
+  
+  --color-s1: #0284c7;
+  --color-s2: #0369a1;
+  
+  --color-v1: #db2777; /* purple-400 -> pink-600 */
+  --color-v2: #be123c; /* purple-500 -> pink-700 */
+  
+  /* Ambient Orbs */
+  --orb-1: rgba(37, 99, 235, 0.06); 
+  --orb-2: rgba(13, 148, 136, 0.05); 
+  --orb-3: rgba(99, 102, 241, 0.05); 
+  
+  /* Grid Color */
+  --grid-color: rgba(37, 99, 235, 0.04);
+
+  /* Unified Design Tokens */
+  --theme-primary: #2563eb;
+  --theme-primary-glow: rgba(37, 99, 235, 0.12);
+  --theme-secondary: #0d9488;
+  --theme-secondary-glow: rgba(13, 148, 136, 0.12);
+  --card-border: rgba(15, 23, 42, 0.08);
+  --card-background: rgba(255, 255, 255, 0.85);
+
+  /* Adaptive Design Tokens */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --input-bg: rgba(255, 255, 255, 0.95);
+  --input-border: rgba(15, 23, 42, 0.12);
+  --input-text: #0f172a;
+  --table-border: rgba(15, 23, 42, 0.06);
+  --table-row-hover: rgba(37, 99, 235, 0.04);
+}
+
+.theme-sense {
+  /* Sense - AI Powered Meditation App Inspired Theme (Pastel Orange & Green) */
+  --background: #f1eae6;
+  --foreground: #22292f;
+  
+  --color-p1: #fecdd3; /* pink-300 -> rose-200 */
+  --color-p2: #fda4af; /* pink-400 -> rose-300 */
+  --color-p3: #ff7c60; /* pink-500 -> coral-orange */
+  --color-p4: #e05e43; /* pink-600 -> dark coral-orange */
+  
+  --color-g1: #a7f3d0; /* green-500 -> emerald-200 */
+  --color-g2: #72c39b; /* green-600 -> misty-green */
+  
+  --color-e1: #72c39b;
+  --color-e2: #52a37b;
+  
+  --color-b1: #cbd5e1; /* blue-400 -> slate-300 */
+  --color-b2: #94a3b8; /* blue-500 -> slate-400 */
+  
+  --color-s1: #cbd5e1;
+  --color-s2: #94a3b8;
+  
+  --color-v1: #fbcfe8; /* purple-400 -> pink-200 */
+  --color-v2: #f472b6; /* purple-500 -> pink-400 */
+  
+  /* Ambient Orbs (Hazy Pastel Orange & Green blobs) */
+  --orb-1: rgba(255, 124, 96, 0.1); 
+  --orb-2: rgba(114, 195, 155, 0.08); 
+  --orb-3: rgba(253, 218, 203, 0.08); 
+  
+  /* Grid Color */
+  --grid-color: rgba(255, 124, 96, 0.03);
+
+  /* Unified Design Tokens */
+  --theme-primary: #ff7c60;
+  --theme-primary-glow: rgba(255, 124, 96, 0.15);
+  --theme-secondary: #72c39b;
+  --theme-secondary-glow: rgba(114, 195, 155, 0.15);
+  --card-border: rgba(255, 255, 255, 0.4);
+  --card-background: rgba(255, 255, 255, 0.55);
+
+  /* Adaptive Design Tokens */
+  --text-primary: #1c2227;
+  --text-secondary: #5c6770;
+  --input-bg: rgba(255, 255, 255, 0.75);
+  --input-border: rgba(28, 34, 39, 0.08);
+  --input-text: #22292f;
+  --table-border: rgba(28, 34, 39, 0.05);
+  --table-row-hover: rgba(255, 124, 96, 0.04);
+}
+
+.theme-sapphire {
+  /* Corporate Sapphire Branding Theme */
+  --background: #070b19;
+  --foreground: #f1f5f9;
+  
+  --color-p1: #93c5fd; /* pink-300 -> blue-300 */
+  --color-p2: #60a5fa; /* pink-400 -> blue-400 */
+  --color-p3: #3b82f6; /* pink-500 -> blue-500 */
+  --color-p4: #2563eb; /* pink-600 -> blue-600 */
+  
+  --color-g1: #fdba74; /* green-500 -> orange-300 */
+  --color-g2: #f97316; /* green-600 -> orange-500 */
+  
+  --color-e1: #f97316; /* emerald-600 -> orange-500 */
+  --color-e2: #ea580c; /* emerald-700 -> orange-600 */
+  
+  --color-b1: #14b8a6; /* blue-400 -> teal-500 */
+  --color-b2: #0d9488; /* blue-500 -> teal-600 */
+  
+  --color-s1: #14b8a6; /* sky-400 -> teal-500 */
+  --color-s2: #0d9488; /* sky-500 -> teal-600 */
+  
+  --color-v1: #fb7185; /* purple-400 -> rose-400 */
+  --color-v2: #f43f5e; /* purple-500 -> rose-500 */
+  
+  /* Ambient Orbs */
+  --orb-1: rgba(59, 130, 246, 0.1); 
+  --orb-2: rgba(249, 115, 22, 0.08); 
+  --orb-3: rgba(20, 184, 166, 0.08); 
+  
+  /* Grid Color */
+  --grid-color: rgba(59, 130, 246, 0.06);
+
+  /* Unified Design Tokens */
+  --theme-primary: #3b82f6;
+  --theme-primary-glow: rgba(59, 130, 246, 0.2);
+  --theme-secondary: #f97316;
+  --theme-secondary-glow: rgba(249, 115, 22, 0.2);
+  --card-border: rgba(59, 130, 246, 0.15);
+  --card-background: rgba(11, 16, 31, 0.7);
+
+  /* Adaptive Design Tokens */
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --input-bg: rgba(17, 24, 39, 0.6);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --input-text: #f8fafc;
+  --table-border: rgba(255, 255, 255, 0.08);
+  --table-row-hover: rgba(255, 255, 255, 0.05);
+}
+
+.theme-cyber {
+  /* Cyber Amethyst & Neon Teal Theme */
+  --background: #080711;
+  --foreground: #f8fafc;
+  
+  --color-p1: #67e8f9; /* pink-300 -> cyan-300 */
+  --color-p2: #22d3ee; /* pink-400 -> cyan-400 */
+  --color-p3: #06b6d4; /* pink-500 -> cyan-500 */
+  --color-p4: #0891b2; /* pink-600 -> cyan-600 */
+  
+  --color-g1: #a855f7; /* green-500 -> purple-500 */
+  --color-g2: #9333ea; /* green-600 -> purple-600 */
+  
+  --color-e1: #a855f7; /* emerald-600 -> purple-600 */
+  --color-e2: #7e22ce; /* emerald-700 -> purple-700 */
+  
+  --color-b1: #fbbf24; /* blue-400 -> amber-400 */
+  --color-b2: #f59e0b; /* blue-500 -> amber-500 */
+  
+  --color-s1: #fbbf24; /* sky-400 -> amber-400 */
+  --color-s2: #f59e0b; /* sky-500 -> amber-500 */
+  
+  --color-v1: #d946ef; /* purple-400 -> magenta-400 */
+  --color-v2: #c084fc; /* purple-500 -> lilac-500 */
+  
+  /* Ambient Orbs */
+  --orb-1: rgba(6, 182, 212, 0.1); 
+  --orb-2: rgba(147, 51, 234, 0.1); 
+  --orb-3: rgba(217, 70, 239, 0.1); 
+  
+  /* Grid Color */
+  --grid-color: rgba(6, 182, 212, 0.08);
+
+  /* Unified Design Tokens */
+  --theme-primary: #06b6d4;
+  --theme-primary-glow: rgba(6, 182, 212, 0.2);
+  --theme-secondary: #a855f7;
+  --theme-secondary-glow: rgba(168, 85, 247, 0.2);
+  --card-border: rgba(6, 182, 212, 0.15);
+  --card-background: rgba(13, 16, 32, 0.7);
+
+  /* Adaptive Design Tokens */
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --input-bg: rgba(17, 24, 39, 0.6);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --input-text: #f8fafc;
+  --table-border: rgba(255, 255, 255, 0.08);
+  --table-row-hover: rgba(255, 255, 255, 0.05);
+}
+
+.theme-emerald {
+  /* Obsidian & Emerald Aurora Theme */
+  --background: #04080e;
+  --foreground: #ecfdf5;
+  
+  --color-p1: #34d399; /* pink-300 -> emerald-400 */
+  --color-p2: #10b981; /* pink-400 -> emerald-500 */
+  --color-p3: #059669; /* pink-500 -> emerald-600 */
+  --color-p4: #047857; /* pink-600 -> emerald-700 */
+  
+  --color-g1: #06b6d4; /* green-500 -> cyan-500 */
+  --color-g2: #0891b2; /* green-600 -> cyan-600 */
+  
+  --color-e1: #06b6d4; /* emerald-600 -> cyan-600 */
+  --color-e2: #0891b2; /* emerald-700 -> cyan-700 */
+  
+  --color-b1: #a78bfa; /* blue-400 -> purple-400 */
+  --color-b2: #8b5cf6; /* blue-500 -> purple-500 */
+  
+  --color-s1: #a78bfa; /* sky-400 -> purple-400 */
+  --color-s2: #8b5cf6; /* sky-500 -> purple-500 */
+  
+  --color-v1: #a3e635; /* purple-400 -> lime-400 */
+  --color-v2: #84cc16; /* purple-500 -> lime-500 */
+  
+  /* Ambient Orbs */
+  --orb-1: rgba(16, 185, 129, 0.08); 
+  --orb-2: rgba(6, 182, 212, 0.08); 
+  --orb-3: rgba(20, 184, 166, 0.08); 
+  
+  /* Grid Color */
+  --grid-color: rgba(16, 185, 129, 0.08);
+
+  /* Unified Design Tokens */
+  --theme-primary: #10b981;
+  --theme-primary-glow: rgba(16, 185, 129, 0.2);
+  --theme-secondary: #06b6d4;
+  --theme-secondary-glow: rgba(6, 182, 212, 0.2);
+  --card-border: rgba(16, 185, 129, 0.15);
+  --card-background: rgba(8, 16, 24, 0.7);
+
+  /* Adaptive Design Tokens */
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --input-bg: rgba(17, 24, 39, 0.6);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --input-text: #f8fafc;
+  --table-border: rgba(255, 255, 255, 0.08);
+  --table-row-hover: rgba(255, 255, 255, 0.05);
+}
+
+.theme-gold {
+  /* Royal Amber & Obsidian Gold Theme */
+  --background: #09090b;
+  --foreground: #fafaf9;
+  
+  --color-p1: #fde047; /* pink-300 -> gold-300 */
+  --color-p2: #facc15; /* pink-400 -> gold-400 */
+  --color-p3: #eab308; /* pink-500 -> gold-500 */
+  --color-p4: #ca8a04; /* pink-600 -> gold-600 */
+  
+  --color-g1: #d97706; /* green-500 -> bronze-500 */
+  --color-g2: #b45309; /* green-600 -> bronze-600 */
+  
+  --color-e1: #d97706; /* emerald-600 -> bronze-600 */
+  --color-e2: #b45309; /* emerald-700 -> bronze-700 */
+  
+  --color-b1: #94a3b8; /* blue-400 -> slate-400 */
+  --color-b2: #64748b; /* blue-500 -> slate-500 */
+  
+  --color-s1: #94a3b8; /* sky-400 -> slate-400 */
+  --color-s2: #64748b; /* sky-500 -> slate-500 */
+  
+  --color-v1: #fbbf24; /* purple-400 -> amber-400 */
+  --color-v2: #f59e0b; /* purple-500 -> amber-500 */
+  
+  /* Ambient Orbs */
+  --orb-1: rgba(234, 179, 8, 0.08); 
+  --orb-2: rgba(217, 119, 6, 0.08); 
+  --orb-3: rgba(180, 83, 9, 0.06); 
+  
+  /* Grid Color */
+  --grid-color: rgba(234, 179, 8, 0.08);
+
+  /* Unified Design Tokens */
+  --theme-primary: #eab308;
+  --theme-primary-glow: rgba(234, 179, 8, 0.2);
+  --theme-secondary: #d97706;
+  --theme-secondary-glow: rgba(217, 119, 6, 0.2);
+  --card-border: rgba(234, 179, 8, 0.15);
+  --card-background: rgba(16, 16, 12, 0.7);
+
+  /* Adaptive Design Tokens */
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --input-bg: rgba(17, 24, 39, 0.6);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --input-text: #f8fafc;
+  --table-border: rgba(255, 255, 255, 0.08);
+  --table-row-hover: rgba(255, 255, 255, 0.05);
+}
+
+.theme-sunset {
+  /* Sunset Velvet & Crimson Theme */
+  --background: #0d070f;
+  --foreground: #fff5f5;
+  
+  --color-p1: #fda4af; /* pink-300 -> rose-300 */
+  --color-p2: #f43f5e; /* pink-400 -> rose-400 */
+  --color-p3: #e11d48; /* pink-500 -> rose-500 */
+  --color-p4: #be123c; /* pink-600 -> rose-600 */
+  
+  --color-g1: #f97316; /* green-500 -> orange-500 */
+  --color-g2: #ea580c; /* green-600 -> orange-600 */
+  
+  --color-e1: #f97316; /* emerald-600 -> orange-600 */
+  --color-e2: #ea580c; /* emerald-700 -> orange-700 */
+  
+  --color-b1: #818cf8; /* blue-400 -> indigo-400 */
+  --color-b2: #6366f1; /* blue-500 -> indigo-500 */
+  
+  --color-s1: #818cf8; /* sky-400 -> indigo-400 */
+  --color-s2: #6366f1; /* sky-500 -> indigo-500 */
+  
+  --color-v1: #a78bfa; /* purple-400 -> violet-400 */
+  --color-v2: #8b5cf6; /* purple-500 -> violet-500 */
+  
+  /* Ambient Orbs */
+  --orb-1: rgba(244, 63, 94, 0.08); 
+  --orb-2: rgba(249, 115, 22, 0.08); 
+  --orb-3: rgba(139, 92, 246, 0.08); 
+  
+  /* Grid Color */
+  --grid-color: rgba(244, 63, 94, 0.08);
+
+  /* Unified Design Tokens */
+  --theme-primary: #e11d48;
+  --theme-primary-glow: rgba(225, 29, 72, 0.2);
+  --theme-secondary: #f97316;
+  --theme-secondary-glow: rgba(249, 115, 22, 0.2);
+  --card-border: rgba(225, 29, 72, 0.15);
+  --card-background: rgba(18, 12, 20, 0.7);
+
+  /* Adaptive Design Tokens */
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --input-bg: rgba(17, 24, 39, 0.6);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --input-text: #f8fafc;
+  --table-border: rgba(255, 255, 255, 0.08);
+  --table-row-hover: rgba(255, 255, 255, 0.05);
+}
+
+.theme-carbon {
+  /* Carbon Cyber Theme (Acid Lime & Cyan) */
+  --background: #020204;
+  --foreground: #e2e8f0;
+  
+  --color-p1: #bef264; /* pink-300 -> lime-300 */
+  --color-p2: #a3e635; /* pink-400 -> lime-400 */
+  --color-p3: #84cc16; /* pink-500 -> lime-500 */
+  --color-p4: #65a30d; /* pink-600 -> lime-600 */
+  
+  --color-g1: #00f3ff; /* green-500 -> cyan-500 */
+  --color-g2: #0891b2; /* green-600 -> cyan-600 */
+  
+  --color-e1: #00f3ff; /* emerald-600 -> cyan-600 */
+  --color-e2: #0891b2; /* emerald-700 -> cyan-700 */
+  
+  --color-b1: #38bdf8; /* blue-400 -> sky-400 */
+  --color-b2: #0284c7; /* blue-500 -> sky-500 */
+  
+  --color-s1: #38bdf8; /* sky-400 -> sky-400 */
+  --color-s2: #0284c7; /* sky-500 -> sky-500 */
+  
+  --color-v1: #fb7185; /* purple-400 -> rose-400 */
+  --color-v2: #f43f5e; /* purple-500 -> rose-500 */
+  
+  /* Ambient Orbs */
+  --orb-1: rgba(132, 204, 22, 0.08); 
+  --orb-2: rgba(0, 243, 255, 0.08); 
+  --orb-3: rgba(244, 63, 94, 0.06); 
+  
+  /* Grid Color */
+  --grid-color: rgba(132, 204, 22, 0.08);
+
+  /* Unified Design Tokens */
+  --theme-primary: #84cc16;
+  --theme-primary-glow: rgba(132, 204, 22, 0.2);
+  --theme-secondary: #00f3ff;
+  --theme-secondary-glow: rgba(0, 243, 255, 0.2);
+  --card-border: rgba(132, 204, 22, 0.15);
+  --card-background: rgba(10, 14, 10, 0.7);
+
+  /* Adaptive Design Tokens */
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --input-bg: rgba(17, 24, 39, 0.6);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --input-text: #f8fafc;
+  --table-border: rgba(255, 255, 255, 0.08);
+  --table-row-hover: rgba(255, 255, 255, 0.05);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  /* Overrides for Primary Colors mapped to CSS theme variables */
+  --color-pink-300: var(--color-p1);
+  --color-pink-400: var(--color-p2);
+  --color-pink-500: var(--color-p3);
+  --color-pink-600: var(--color-p4);
+  
+  --color-green-500: var(--color-g1);
+  --color-green-600: var(--color-g2);
+  --color-emerald-600: var(--color-e1);
+  --color-emerald-700: var(--color-e2);
+  
+  --color-blue-400: var(--color-b1);
+  --color-blue-500: var(--color-b2);
+  --color-sky-400: var(--color-s1);
+  --color-sky-500: var(--color-s2);
+  
+  --color-purple-400: var(--color-v1);
+  --color-purple-500: var(--color-v2);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -0.01em;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  * {
+    color: black !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+
+  .bg-white\/5, .bg-white\/10, .bg-black\/40 {
+    background: transparent !important;
+    border-color: #e5e7eb !important;
+  }
+  
+  .print\:hidden {
+    display: none !important;
+  }
+}
+
+/* =========================================
+   CYBER AMETHYST & NEON TEAL UI SETTINGS
+   ========================================= */
+
+/* Ambient Orb Movement animations */
+@keyframes floatBackground {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.15; }
+  50% { transform: translateY(-10px) scale(1.02); opacity: 0.2; }
+}
+.animate-float-slow {
+  animation: floatBackground 20s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+@keyframes floatBackgroundReverse {
+  0%, 100% { transform: translateY(0) scale(1.02); opacity: 0.2; }
+  50% { transform: translateY(10px) scale(1); opacity: 0.1; }
+}
+.animate-float-slow-reverse {
+  animation: floatBackgroundReverse 25s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0px transparent; }
+  50% { box-shadow: 0 0 15px var(--theme-secondary-glow); }
+}
+.cyber-glow-hover:hover {
+  animation: pulseGlow 2s infinite;
+  border-color: var(--theme-secondary) !important;
+}
+
+@keyframes modalEntrance {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); backdrop-filter: blur(0px); }
+  to { opacity: 1; transform: translateY(0) scale(1); backdrop-filter: blur(24px); }
+}
+.premium-modal {
+  animation: modalEntrance 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Dynamic Ambient Orbs */
+.orb-1 {
+  background-color: var(--orb-1) !important;
+  transition: background-color 0.5s ease;
+}
+.orb-2 {
+  background-color: var(--orb-2) !important;
+  transition: background-color 0.5s ease;
+}
+.orb-3 {
+  background-color: var(--orb-3) !important;
+  transition: background-color 0.5s ease;
+}
+
+/* Sophisticated Dot Background */
+.cyber-grid {
+  background-image: radial-gradient(var(--grid-color) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+  transition: background-image 0.5s ease;
+}
+
+/* Holographic Card Utility - Premium Glassmorphic Card linked to active theme */
+.holographic-card {
+  background: var(--card-background);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.holographic-card:hover {
+  border-color: var(--theme-primary) !important;
+  box-shadow: 0 10px 30px var(--theme-primary-glow), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Input Fields - Deep Slate Style with Theme Glow on Focus */
+input, select, textarea {
+  background-color: var(--input-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  color: var(--input-text) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--theme-secondary) !important;
+  box-shadow: 0 0 0 2px var(--theme-secondary-glow) !important;
+  outline: none !important;
+}
+
+/* Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-primary);
+}
+
+/* Global overrides to force light-mode elements into active theme styles in non-print mode */
+@media screen {
+  /* Page wrapper backgrounds (solid gray/light themes) */
+  .bg-gray-50, .bg-gray-100, .bg-slate-50, .bg-slate-100 {
+    background-color: transparent !important;
+  }
+  
+  /* Solid white cards -> Glassmorphic cards */
+  .bg-white {
+    background-color: var(--card-background) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-color: var(--card-border) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25) !important;
+  }
+  
+  /* Tables and tables components */
+  table {
+    border-color: var(--table-border) !important;
+  }
+  thead {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+  }
+  th {
+    color: var(--text-secondary) !important;
+    border-color: var(--table-border) !important;
+  }
+  td {
+    color: var(--foreground) !important;
+    border-color: var(--table-border) !important;
+  }
+  .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+    border-color: var(--table-border) !important;
+  }
+  
+  /* Headers (typically bg-white border-b sticky top-0) */
+  header.bg-white, .sticky.bg-white {
+    background-color: var(--card-background) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-bottom: 1px solid var(--card-border) !important;
+  }
+
+  /* Borders override */
+  .border-gray-200, .border-gray-300, .border-slate-200 {
+    border-color: var(--card-border) !important;
+  }
+
+  /* Text colors overrides */
+  .text-gray-900, .text-gray-800, .text-gray-700, .text-slate-900, .text-slate-800 {
+    color: var(--text-primary) !important;
+  }
+  .text-gray-500, .text-gray-600, .text-slate-500, .text-slate-600 {
+    color: var(--text-secondary) !important;
+  }
+  .text-gray-400, .text-slate-400 {
+    color: var(--text-secondary) !important;
+    opacity: 0.8;
+  }
+  .text-gray-900\/60, .text-gray-900\/40, .text-gray-900\/80 {
+    color: var(--text-primary) !important;
+    opacity: 0.7;
+  }
+  
+  /* Lighter text elements overrides */
+  .text-slate-100, .text-slate-200, .text-slate-300, .text-gray-100, .text-gray-200, .text-gray-300 {
+    color: var(--text-primary) !important;
+  }
+
+  /* Hardcoded white text overrides inside containers for light-theme compatibility */
+  .holographic-card .text-white, 
+  .bg-white .text-white, 
+  table .text-white, 
+  tbody .text-white, 
+  td .text-white, 
+  th .text-white,
+  header .text-white,
+  main h1.text-white,
+  main h2.text-white,
+  main h3.text-white,
+  .text-white.font-bold,
+  .text-white.font-semibold {
+    color: var(--text-primary) !important;
+  }
+
+  /* Cyan text overrides for numbers/details in cards and pages */
+  .text-cyan-200, .text-cyan-300, .text-cyan-400 {
+    color: var(--theme-primary) !important;
+  }
+
+  /* Overrides for opacity/faint text and placeholders */
+  .text-white\/20, .text-white\/30, .text-white\/40, .text-white\/50, .text-white\/60, .text-white\/70, .text-white\/80 {
+    color: var(--text-secondary) !important;
+    opacity: 1 !important;
+  }
+  .text-slate-400\/40, .text-slate-400\/60, .text-slate-400\/80, .text-gray-400\/40, .text-gray-400\/60, .text-gray-400\/80 {
+    color: var(--text-secondary) !important;
+    opacity: 1 !important;
+  }
+
+  /* Placeholder overrides */
+  ::placeholder, .placeholder-white\/30, .placeholder-gray-400, input::placeholder, textarea::placeholder {
+    color: var(--text-secondary) !important;
+    opacity: 0.65 !important;
+  }
+
+  /* Action icons visibility overrides inside cards, lists, tables */
+  .holographic-card svg, table svg, tbody svg, .bg-white svg {
+    color: var(--text-secondary) !important;
+    opacity: 0.9 !important;
+  }
+  .holographic-card button:hover svg, table button:hover svg, tbody button:hover svg {
+    color: var(--theme-primary) !important;
+  }
+
+  /* Inactive tab buttons, select boxes and filter borders visibility overrides */
+  button.border-white\/10, button.bg-white\/5, .border-white\/5, .border-white\/10 {
+    border-color: var(--card-border) !important;
+  }
+  button.text-slate-400, a.text-slate-400 {
+    color: var(--text-secondary) !important;
+  }
+
+  /* Page titles and main typography header overrides */
+  h1, h2, h3, h4, h5, h6, .text-2xl, .text-3xl, .text-xl {
+    color: var(--text-primary) !important;
+  }
+
+  /* Buttons and interactive elements */
+  /* Blue buttons -> dynamic gradient based on active theme colors */
+  .bg-blue-600, .bg-blue-500 {
+    background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 100%) !important;
+    border: none !important;
+    color: #fff !important;
+  }
+  .hover\:bg-blue-700:hover, .hover\:bg-blue-600:hover {
+    opacity: 0.9 !important;
+  }
+
+  /* Print Preview pages overrides to ensure they remain white-and-black paper on screen */
+  .print-preview,
+  .print-preview * {
+    background-color: white !important;
+    background-image: none !important;
+    color: black !important;
+    border-color: #9ca3af !important;
+    opacity: 1 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* Dynamic Font Size Customizations */
+.font-size-large, .font-size-large * {
+  font-size: 104% !important;
+}
+.font-size-xlarge, .font-size-xlarge * {
+  font-size: 108% !important;
+}
+
+/* Glassmorphism Blur customization classes */
+.blur-none, .blur-none * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.blur-ultra, .blur-ultra .bg-white, .blur-ultra header, .blur-ultra .premium-modal {
+  backdrop-filter: blur(32px) !important;
+  -webkit-backdrop-filter: blur(32px) !important;
+}

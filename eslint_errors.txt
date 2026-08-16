@@ -1,0 +1,554 @@
+
+/Users/rajeshkumarvarma/Desktop/FOUR_ (R)_PLASTIC/frontend/app/backup/page.js
+  297:65  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  297:79  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/Users/rajeshkumarvarma/Desktop/FOUR_ (R)_PLASTIC/frontend/app/banks/page.js
+  251:65  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  251:74  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/Users/rajeshkumarvarma/Desktop/FOUR_ (R)_PLASTIC/frontend/app/items/page.js
+  379:65  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  379:74  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/Users/rajeshkumarvarma/Desktop/FOUR_ (R)_PLASTIC/frontend/app/payments/payment/[id]/page.js
+  271:68  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  271:89  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/rajeshkumarvarma/Desktop/FOUR_ (R)_PLASTIC/frontend/app/payments/receipt/[id]/page.js
+  271:60  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  271:81  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/rajeshkumarvarma/Desktop/FOUR_ (R)_PLASTIC/frontend/app/payroll/attendance/page.js
+  314:63  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/rajeshkumarvarma/Desktop/FOUR_ (R)_PLASTIC/frontend/app/payroll/employees/new/page.js
+  465:27  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  465:41  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/Users/rajeshkumarvarma/Desktop/FOUR_ (R)_PLASTIC/frontend/app/payroll/page.js
+  395:61  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/rajeshkumarvarma/Desktop/FOUR_ (R)_PLASTIC/frontend/app/payroll/payslips/[id]/page.js
+  179:12  error  'XCircleIcon' is not defined  react/jsx-no-undef
+
+/Users/rajeshkumarvarma/Desktop/FOUR_ (R)_PLASTIC/frontend/app/payroll/surplus/generate/page.js
+  608:43  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  608:60  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/Users/rajeshkumarvarma/Desktop/FOUR_ (R)_PLASTIC/frontend/app/purchase-invoices/edit/[id]/page.js
+   70:5   error  Error: Cannot access variable before it is declared
+
+`checkAuth` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  68 |   // First effect: Load vendors and items
+  69 |   useEffect(() => {
+> 70 |     checkAuth()
+     |     ^^^^^^^^^ `checkAuth` accessed before it is declared
+  71 |     fetchVendors()
+  72 |     fetchItems()
+  73 |   }, [])
+
+  84 |   }, [formData.items, formData.discount, taxType])
+  85 |
+> 86 |   const checkAuth = () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 87 |     const user = localStorage.getItem('user')
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 88 |     if (!user) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 89 |       router.push('/')
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 90 |     }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 91 |   }
+     | ^^^^ `checkAuth` is declared here
+  92 |
+  93 |   const fetchInvoice = async () => {
+  94 |     try {  react-hooks/immutability
+   71:5   error  Error: Cannot access variable before it is declared
+
+`fetchVendors` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  69 |   useEffect(() => {
+  70 |     checkAuth()
+> 71 |     fetchVendors()
+     |     ^^^^^^^^^^^^ `fetchVendors` accessed before it is declared
+  72 |     fetchItems()
+  73 |   }, [])
+  74 |
+
+  172 |   }
+  173 |
+> 174 |   const fetchVendors = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 175 |     try {
+      | ^^^^^^^^^
+> 176 |       const response = await axios.get('http://localhost:5000/api/vendors/')
+      | ^^^^^^^^^
+> 177 |       setVendors(response.data)
+      | ^^^^^^^^^
+> 178 |     } catch (error) {
+      | ^^^^^^^^^
+> 179 |       toast.error('Failed to fetch vendors')
+      | ^^^^^^^^^
+> 180 |     }
+      | ^^^^^^^^^
+> 181 |   }
+      | ^^^^ `fetchVendors` is declared here
+  182 |
+  183 |   const fetchItems = async () => {
+  184 |     try {                                      react-hooks/immutability
+   72:5   error  Error: Cannot access variable before it is declared
+
+`fetchItems` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  70 |     checkAuth()
+  71 |     fetchVendors()
+> 72 |     fetchItems()
+     |     ^^^^^^^^^^ `fetchItems` accessed before it is declared
+  73 |   }, [])
+  74 |
+  75 |   // Second effect: Load invoice only after items and vendors are loaded
+
+  181 |   }
+  182 |
+> 183 |   const fetchItems = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 184 |     try {
+      | ^^^^^^^^^
+> 185 |       const rawRes = await axios.get('http://localhost:5000/api/items/?type=raw_material')
+      …
+      | ^^^^^^^^^
+> 215 |     }
+      | ^^^^^^^^^
+> 216 |   }
+      | ^^^^ `fetchItems` is declared here
+  217 |
+  218 |   const handleVendorChange = (e) => {
+  219 |     const vendorId = parseInt(e.target.value)                                                                                                                 react-hooks/immutability
+   78:7   error  Error: Cannot access variable before it is declared
+
+`fetchInvoice` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  76 |   useEffect(() => {
+  77 |     if (allItems.length > 0 && vendors.length > 0) {
+> 78 |       fetchInvoice()
+     |       ^^^^^^^^^^^^ `fetchInvoice` accessed before it is declared
+  79 |     }
+  80 |   }, [allItems, vendors])
+  81 |
+
+   91 |   }
+   92 |
+>  93 |   const fetchInvoice = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  94 |     try {
+      | ^^^^^^^^^
+>  95 |       const response = await axios.get(`http://localhost:5000/api/purchase-invoices/${invoiceId}`)
+      …
+      | ^^^^^^^^^
+> 171 |     }
+      | ^^^^^^^^^
+> 172 |   }
+      | ^^^^ `fetchInvoice` is declared here
+  173 |
+  174 |   const fetchVendors = async () => {
+  175 |     try {                                                                                                                                        react-hooks/immutability
+   83:5   error  Error: Cannot access variable before it is declared
+
+`calculateTotals` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  81 |
+  82 |   useEffect(() => {
+> 83 |     calculateTotals()
+     |     ^^^^^^^^^^^^^^^ `calculateTotals` accessed before it is declared
+  84 |   }, [formData.items, formData.discount, taxType])
+  85 |
+  86 |   const checkAuth = () => {
+
+  366 |   }
+  367 |
+> 368 |   const calculateTotals = () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 369 |     const items = formData.items
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 370 |     
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 393 |     }))
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 394 |   }
+      | ^^^^ `calculateTotals` is declared here
+  395 |
+  396 |   const handleSubmit = async (e) => {
+  397 |     e.preventDefault()                                                                                                                           react-hooks/immutability
+  870:70  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           react/no-unescaped-entities
+  870:79  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           react/no-unescaped-entities
+
+/Users/rajeshkumarvarma/Desktop/FOUR_ (R)_PLASTIC/frontend/app/purchase-invoices/new/page.js
+   80:5   error  Error: Cannot access variable before it is declared
+
+`checkAuth` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  78 |
+  79 |   useEffect(() => {
+> 80 |     checkAuth()
+     |     ^^^^^^^^^ `checkAuth` accessed before it is declared
+  81 |     fetchVendors()
+  82 |     fetchItems()
+  83 |     generateInvoiceNumber()
+
+   95 |   }, [applyGstToAll, selectedGstRate])
+   96 |
+>  97 |   const checkAuth = () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^
+>  98 |     const user = localStorage.getItem('user')
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  99 |     if (!user) {
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 100 |       router.push('/')
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 101 |     }
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 102 |   }
+      | ^^^^ `checkAuth` is declared here
+  103 |
+  104 |   const generateInvoiceNumber = () => {
+  105 |     const date = new Date()                                                                                                                                                                            react-hooks/immutability
+   81:5   error  Error: Cannot access variable before it is declared
+
+`fetchVendors` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  79 |   useEffect(() => {
+  80 |     checkAuth()
+> 81 |     fetchVendors()
+     |     ^^^^^^^^^^^^ `fetchVendors` accessed before it is declared
+  82 |     fetchItems()
+  83 |     generateInvoiceNumber()
+  84 |   }, [])
+
+  110 |   }
+  111 |
+> 112 |   const fetchVendors = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 113 |     try {
+      | ^^^^^^^^^
+> 114 |       const response = await axios.get(`${API_BASE_URL}/vendors`)
+      | ^^^^^^^^^
+> 115 |       setVendors(response.data)
+      | ^^^^^^^^^
+> 116 |     } catch (error) {
+      | ^^^^^^^^^
+> 117 |       console.error('Error fetching vendors:', error)
+      | ^^^^^^^^^
+> 118 |       toast.error('Failed to fetch vendors')
+      | ^^^^^^^^^
+> 119 |     }
+      | ^^^^^^^^^
+> 120 |   }
+      | ^^^^ `fetchVendors` is declared here
+  121 |
+  122 |   const fetchItems = async () => {
+  123 |     try {                                                                                                                  react-hooks/immutability
+   82:5   error  Error: Cannot access variable before it is declared
+
+`fetchItems` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  80 |     checkAuth()
+  81 |     fetchVendors()
+> 82 |     fetchItems()
+     |     ^^^^^^^^^^ `fetchItems` accessed before it is declared
+  83 |     generateInvoiceNumber()
+  84 |   }, [])
+  85 |
+
+  120 |   }
+  121 |
+> 122 |   const fetchItems = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 123 |     try {
+      | ^^^^^^^^^
+> 124 |       const response = await axios.get(`${API_BASE_URL}/items`)
+      …
+      | ^^^^^^^^^
+> 140 |     }
+      | ^^^^^^^^^
+> 141 |   }
+      | ^^^^ `fetchItems` is declared here
+  142 |
+  143 |   const handleVendorChange = (e) => {
+  144 |     const vendorId = parseInt(e.target.value)                                                                                                                                                                                                                                                                                                                                                                      react-hooks/immutability
+   83:5   error  Error: Cannot access variable before it is declared
+
+`generateInvoiceNumber` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  81 |     fetchVendors()
+  82 |     fetchItems()
+> 83 |     generateInvoiceNumber()
+     |     ^^^^^^^^^^^^^^^^^^^^^ `generateInvoiceNumber` accessed before it is declared
+  84 |   }, [])
+  85 |
+  86 |   useEffect(() => {
+
+  102 |   }
+  103 |
+> 104 |   const generateInvoiceNumber = () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 105 |     const date = new Date()
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 106 |     const year = date.getFullYear().toString().slice(-2)
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 107 |     const month = (date.getMonth() + 1).toString().padStart(2, '0')
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 108 |     const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 109 |     setInvoiceNo(`PUR${year}${month}${random}`)
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 110 |   }
+      | ^^^^ `generateInvoiceNumber` is declared here
+  111 |
+  112 |   const fetchVendors = async () => {
+  113 |     try {  react-hooks/immutability
+   87:5   error  Error: Cannot access variable before it is declared
+
+`calculateTotals` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  85 |
+  86 |   useEffect(() => {
+> 87 |     calculateTotals()
+     |     ^^^^^^^^^^^^^^^ `calculateTotals` accessed before it is declared
+  88 |   }, [formData.items, formData.discount, taxType])
+  89 |
+  90 |   // Apply GST rate to all items when checkbox is checked
+
+  343 |   }
+  344 |
+> 345 |   const calculateTotals = () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 346 |     const items = formData.items
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 347 |     
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 374 |     }))
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 375 |   }
+      | ^^^^ `calculateTotals` is declared here
+  376 |
+  377 |   const applyGstRateToAll = () => {
+  378 |     if (formData.items.length > 0) {                                                                                                                                                                                                                                                              react-hooks/immutability
+   93:7   error  Error: Cannot access variable before it is declared
+
+`applyGstRateToAll` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  91 |   useEffect(() => {
+  92 |     if (applyGstToAll && formData.items.length > 0) {
+> 93 |       applyGstRateToAll()
+     |       ^^^^^^^^^^^^^^^^^ `applyGstRateToAll` accessed before it is declared
+  94 |     }
+  95 |   }, [applyGstToAll, selectedGstRate])
+  96 |
+
+  375 |   }
+  376 |
+> 377 |   const applyGstRateToAll = () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 378 |     if (formData.items.length > 0) {
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 379 |       const updatedItems = [...formData.items]
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 399 |     }
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 400 |   }
+      | ^^^^ `applyGstRateToAll` is declared here
+  401 |
+  402 |   const handleSubmit = async (e) => {
+  403 |     e.preventDefault()                                                                                                                                                                                                          react-hooks/immutability
+  973:70  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react/no-unescaped-entities
+  973:79  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react/no-unescaped-entities
+
+/Users/rajeshkumarvarma/Desktop/FOUR_ (R)_PLASTIC/frontend/app/raw-materials/page.js
+  273:65  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  273:82  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/Users/rajeshkumarvarma/Desktop/FOUR_ (R)_PLASTIC/frontend/app/sales-invoices/edit/[id]/page.js
+   92:7   error  Error: Cannot access variable before it is declared
+
+`checkAuth` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  90 |     if (invoiceId) {
+  91 |       console.log('Invoice ID is now available:', invoiceId)
+> 92 |       checkAuth()
+     |       ^^^^^^^^^ `checkAuth` accessed before it is declared
+  93 |       fetchInvoice()
+  94 |       fetchCustomers()
+  95 |       fetchItems()
+
+  102 |   }, [formData.items, formData.discount, taxType])
+  103 |
+> 104 |   const checkAuth = () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 105 |     const user = localStorage.getItem('user')
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 106 |     if (!user) {
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 107 |       router.push('/')
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 108 |     }
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 109 |   }
+      | ^^^^ `checkAuth` is declared here
+  110 |
+  111 |   const fetchInvoice = async () => {
+  112 |     try {  react-hooks/immutability
+   93:7   error  Error: Cannot access variable before it is declared
+
+`fetchInvoice` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  91 |       console.log('Invoice ID is now available:', invoiceId)
+  92 |       checkAuth()
+> 93 |       fetchInvoice()
+     |       ^^^^^^^^^^^^ `fetchInvoice` accessed before it is declared
+  94 |       fetchCustomers()
+  95 |       fetchItems()
+  96 |       fetchDeliveryChallans()
+
+  109 |   }
+  110 |
+> 111 |   const fetchInvoice = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 112 |     try {
+      | ^^^^^^^^^
+> 113 |       console.log('Fetching invoice ID:', invoiceId)
+      …
+      | ^^^^^^^^^
+> 184 |     }
+      | ^^^^^^^^^
+> 185 |   }
+      | ^^^^ `fetchInvoice` is declared here
+  186 |
+  187 |   const fetchCustomers = async () => {
+  188 |     try {                                                                                                                                                                                                 react-hooks/immutability
+   94:7   error  Error: Cannot access variable before it is declared
+
+`fetchCustomers` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  92 |       checkAuth()
+  93 |       fetchInvoice()
+> 94 |       fetchCustomers()
+     |       ^^^^^^^^^^^^^^ `fetchCustomers` accessed before it is declared
+  95 |       fetchItems()
+  96 |       fetchDeliveryChallans()
+  97 |     }
+
+  185 |   }
+  186 |
+> 187 |   const fetchCustomers = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 188 |     try {
+      | ^^^^^^^^^
+> 189 |       console.log('Fetching customers...')
+      …
+      | ^^^^^^^^^
+> 196 |     }
+      | ^^^^^^^^^
+> 197 |   }
+      | ^^^^ `fetchCustomers` is declared here
+  198 |
+  199 |   // UPDATED: Fetch both raw materials and finished goods
+  200 |   const fetchItems = async () => {                                                                                                                                                                                                          react-hooks/immutability
+   95:7   error  Error: Cannot access variable before it is declared
+
+`fetchItems` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  93 |       fetchInvoice()
+  94 |       fetchCustomers()
+> 95 |       fetchItems()
+     |       ^^^^^^^^^^ `fetchItems` accessed before it is declared
+  96 |       fetchDeliveryChallans()
+  97 |     }
+  98 |   }, [invoiceId])
+
+  198 |
+  199 |   // UPDATED: Fetch both raw materials and finished goods
+> 200 |   const fetchItems = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 201 |     try {
+      | ^^^^^^^^^
+> 202 |       console.log('Fetching items...')
+      …
+      | ^^^^^^^^^
+> 226 |     }
+      | ^^^^^^^^^
+> 227 |   }
+      | ^^^^ `fetchItems` is declared here
+  228 |
+  229 |   const fetchDeliveryChallans = async () => {
+  230 |     try {                                                                                                                                                                                                                     react-hooks/immutability
+   96:7   error  Error: Cannot access variable before it is declared
+
+`fetchDeliveryChallans` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  94 |       fetchCustomers()
+  95 |       fetchItems()
+> 96 |       fetchDeliveryChallans()
+     |       ^^^^^^^^^^^^^^^^^^^^^ `fetchDeliveryChallans` accessed before it is declared
+  97 |     }
+  98 |   }, [invoiceId])
+  99 |
+
+  227 |   }
+  228 |
+> 229 |   const fetchDeliveryChallans = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 230 |     try {
+      | ^^^^^^^^^
+> 231 |       console.log('Fetching delivery challans...')
+      …
+      | ^^^^^^^^^
+> 238 |     }
+      | ^^^^^^^^^
+> 239 |   }
+      | ^^^^ `fetchDeliveryChallans` is declared here
+  240 |
+  241 |   const handleCustomerChange = (e) => {
+  242 |     const customerId = parseInt(e.target.value)                                                                                                                                                                                  react-hooks/immutability
+  101:5   error  Error: Cannot access variable before it is declared
+
+`calculateTotals` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+   99 |
+  100 |   useEffect(() => {
+> 101 |     calculateTotals()
+      |     ^^^^^^^^^^^^^^^ `calculateTotals` accessed before it is declared
+  102 |   }, [formData.items, formData.discount, taxType])
+  103 |
+  104 |   const checkAuth = () => {
+
+  396 |   }
+  397 |
+> 398 |   const calculateTotals = () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 399 |     const items = formData.items
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 400 |     
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 423 |     }))
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 424 |   }
+      | ^^^^ `calculateTotals` is declared here
+  425 |
+  426 |   const handleSubmit = async (e) => {
+  427 |     e.preventDefault()                                                                                                                                                                               react-hooks/immutability
+  873:70  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+  873:79  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+
+/Users/rajeshkumarvarma/Desktop/FOUR_ (R)_PLASTIC/frontend/app/sales-invoices/new/page.js
+  576:62  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  576:71  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+✖ 44 problems (44 errors, 0 warnings)
+

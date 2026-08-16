@@ -1,0 +1,648 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import axios from 'axios'
+import toast from 'react-hot-toast'
+import { 
+  CubeIcon,
+  ArrowLeftIcon,
+  MagnifyingGlassIcon,
+  ExclamationTriangleIcon,
+  ChartBarIcon,
+  ArrowPathIcon,
+  PencilIcon,
+  BeakerIcon,
+  ScaleIcon,
+  EyeIcon,
+  XMarkIcon,
+  InformationCircleIcon,
+  ClockIcon
+} from '@heroicons/react/24/outline'
+
+// API Base URL
+const API_BASE_URL = 'http://localhost:5000/api'
+
+export default function StockReportPage() {
+  const [rawMaterials, setRawMaterials] = useState([])
+  const [finishedGoods, setFinishedGoods] = useState([])
+  const [productions, setProductions] = useState([])
+  const [consumptions, setConsumptions] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  const [lastUpdated, setLastUpdated] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [activeTab, setActiveTab] = useState('all')
+  const [selectedFinishedGood, setSelectedFinishedGood] = useState(null)
+  const [showProductionModal, setShowProductionModal] = useState(false)
+  const [summary, setSummary] = useState({
+    totalItems: 0,
+    lowStockItems: 0,
+    totalValue: 0,
+    totalProductionQty: 0,
+    totalRawConsumed: 0
+  })
+  const router = useRouter()
+
+  useEffect(() => {
+    checkAuth()
+    fetchAllData()
+  }, [])
+
+  const checkAuth = () => {
+    const user = localStorage.getItem('user')
+    if (!user) {
+      router.push('/')
+    }
+  }
+
+  const fetchAllData = async (showRefreshToast = false) => {
+    try {
+      if (showRefreshToast) {
+        setRefreshing(true)
+      } else {
+        setLoading(true)
+      }
+      
+      // Fetch raw materials stock
+      const rawResponse = await axios.get(`${API_BASE_URL}/stock/raw-materials`)
+      const rawData = rawResponse.data
+      
+      // Fetch finished goods stock
+      const finishedResponse = await axios.get(`${API_BASE_URL}/stock/finished-goods`)
+      const finishedData = finishedResponse.data
+      
+      // Fetch production entries
+      let productionsData = []
+      let consumptionsData = []
+      try {
+        const prodResponse = await axios.get(`${API_BASE_URL}/production`)
+        productionsData = prodResponse.data
+        console.log('Production data:', productionsData)
+        
+        // Extract consumptions from productions
+        if (productionsData.length > 0) {
+          productionsData.forEach(p => {
+            if (p.consumptions && p.consumptions.length > 0) {
+              consumptionsData = [...consumptionsData, ...p.consumptions.map(c => ({
+                ...c,
+                production_id: p.id,
+                finished_good_id: p.finished_good_id
+              }))]
+            }
+          })
+        }
+      } catch (error) {
+        console.log('No production data found')
+      }
+      
+      setRawMaterials(rawData)
+      setFinishedGoods(finishedData)
+      setProductions(productionsData)
+      setConsumptions(consumptionsData)
+      
+      // Calculate summary
+      const allItems = [...rawData, ...finishedData]
+      const lowStock = allItems.filter(item => 
+        item.alert_level === 'Low Stock' || item.alert_level === 'Critical'
+      )
+      const totalValue = allItems.reduce((sum, item) => sum + (item.stock_value || 0), 0)
+      
+      const totalProductionQty = productionsData.reduce((sum, p) => 
+        sum + (p.good_quantity || 0), 0)
+      
+      const totalRawConsumed = consumptionsData.reduce((sum, c) => 
+        sum + (c.quantity_used || c.quantity || 0), 0)
+      
+      setSummary({
+        totalItems: allItems.length,
+        lowStockItems: lowStock.length,
+        totalValue: totalValue,
+        totalProductionQty,
+        totalRawConsumed
+      })
+      
+      setLastUpdated(new Date())
+      
+      if (showRefreshToast) {
+        toast.success('Stock data refreshed!')
+      }
+      
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      toast.error('Failed to fetch stock data')
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
+    }
+  }
+
+  // Calculate production capacity for a finished good
+  const calculateProductionCapacity = (finishedGood) => {
+    // Get all productions for this finished good
+    const relevantProductions = productions.filter(p => 
+      p.finished_good_id === finishedGood.id
+    )
+    
+    if (relevantProductions.length === 0) {
+      return { possible: 0, limiting: null, details: [] }
+    }
+    
+    // Get all consumptions for this finished good
+    const relevantConsumptions = consumptions.filter(c => 
+      c.finished_good_id === finishedGood.id
+    )
+    
+    if (relevantConsumptions.length === 0) {
+      return { possible: 0, limiting: null, details: [] }
+    }
+    
+    // Calculate average consumption per raw material
+    const consumptionPerUnit = {}
+    const rawMaterialUsage = {}
+    
+    relevantConsumptions.forEach(cons => {
+      const production = relevantProductions.find(p => p.id === cons.production_id)
+      if (production) {
+        const producedQty = production.good_quantity || 1
+        const perUnit = cons.quantity_used / producedQty
+        
+        if (!consumptionPerUnit[cons.raw_material_id]) {
+          consumptionPerUnit[cons.raw_material_id] = []
+          rawMaterialUsage[cons.raw_material_id] = {
+            name: '',
+            totalConsumed: 0,
+            totalProduced: 0
+          }
+        }
+        
+        consumptionPerUnit[cons.raw_material_id].push(perUnit)
+        rawMaterialUsage[cons.raw_material_id].totalConsumed += cons.quantity_used
+        rawMaterialUsage[cons.raw_material_id].totalProduced += producedQty
+      }
+    })
+    
+    // Calculate average per unit
+    const avgPerUnit = {}
+    Object.keys(consumptionPerUnit).forEach(matId => {
+      const values = consumptionPerUnit[matId]
+      avgPerUnit[matId] = values.reduce((a, b) => a + b, 0) / values.length
+      
+      // Get material name from raw materials
+      const material = rawMaterials.find(r => r.id === parseInt(matId))
+      if (material) {
+        rawMaterialUsage[matId].name = material.name
+      }
+    })
+    
+    // Calculate how many units can be produced
+    let possibleUnits = Infinity
+    let limitingMaterial = null
+    
+    const details = []
+    
+    Object.keys(avgPerUnit).forEach(matId => {
+      const material = rawMaterials.find(r => r.id === parseInt(matId))
+      if (material) {
+        const availableStock = material.current_stock || 0
+        const neededPerUnit = avgPerUnit[matId]
+        const possible = Math.floor(availableStock / neededPerUnit)
+        
+        details.push({
+          materialName: material.name,
+          availableStock,
+          neededPerUnit,
+          possible,
+          unit: material.unit
+        })
+        
+        if (possible < possibleUnits) {
+          possibleUnits = possible
+          limitingMaterial = material.name
+        }
+      }
+    })
+    
+    return {
+      possible: possibleUnits === Infinity ? 0 : possibleUnits,
+      limiting: limitingMaterial,
+      details
+    }
+  }
+
+  const handleEditItem = (item) => {
+    router.push(`/items/edit/${item.id}?type=${item.type || 'raw_material'}`)
+  }
+
+  const handleViewProduction = (item) => {
+    setSelectedFinishedGood(item)
+    setShowProductionModal(true)
+  }
+
+  const handleRefresh = () => {
+    fetchAllData(true)
+  }
+
+  const getStatusColor = (status) => {
+    switch(status) {
+      case 'Low Stock':
+      case 'Critical':
+        return 'bg-red-500/20 text-red-400 border-red-500/30'
+      case 'Reorder Level':
+      case 'Warning':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+      case 'Normal':
+      case 'Good':
+        return 'bg-green-500/20 text-green-400 border-green-500/30'
+      default:
+        return 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+    }
+  }
+
+  const getStatusIcon = (status) => {
+    switch(status) {
+      case 'Low Stock':
+      case 'Critical':
+        return <ExclamationTriangleIcon className="h-4 w-4 text-red-400" />
+      case 'Reorder Level':
+      case 'Warning':
+        return <ExclamationTriangleIcon className="h-4 w-4 text-yellow-400" />
+      default:
+        return <CubeIcon className="h-4 w-4 text-green-400" />
+    }
+  }
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0
+    }).format(amount)
+  }
+
+  const formatNumber = (num) => {
+    return new Intl.NumberFormat('en-IN', {
+      maximumFractionDigits: 2
+    }).format(num || 0)
+  }
+
+  const formatDateTime = (date) => {
+    if (!date) return 'Never'
+    return date.toLocaleString('en-IN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })
+  }
+
+  const filteredRawMaterials = rawMaterials.filter(item =>
+    item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.location?.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  const filteredFinishedGoods = finishedGoods.filter(item =>
+    item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.location?.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-white border-r-transparent"></div>
+          <p className="text-white/70 mt-4">Loading stock data...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900">
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
+      
+      <div className="relative">
+        {/* Header */}
+        <header className="bg-white/10 backdrop-blur-xl border-b border-white/20 sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => router.push('/dashboard')}
+                  className="p-2 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20"
+                >
+                  <ArrowLeftIcon className="h-5 w-5" />
+                </button>
+                <ChartBarIcon className="h-8 w-8 text-pink-400" />
+                <h1 className="text-2xl font-bold text-white">
+                  STOCK REPORT
+                </h1>
+              </div>
+              <div className="flex items-center gap-4">
+                {lastUpdated && (
+                  <div className="flex items-center gap-1 text-white/50 text-sm">
+                    <ClockIcon className="h-4 w-4" />
+                    <span>Last updated: {formatDateTime(lastUpdated)}</span>
+                  </div>
+                )}
+                <button
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  className={`px-4 py-2 bg-white/10 border border-white/20 
+                    rounded-lg text-white hover:bg-white/20
+                    flex items-center gap-2 transition-all
+                    ${refreshing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <ArrowPathIcon className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+                  {refreshing ? 'Refreshing...' : 'Refresh'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-white/60 text-sm">Total Items</p>
+                  <p className="text-3xl font-bold text-white mt-2">{summary.totalItems}</p>
+                </div>
+                <div className="p-3 bg-blue-500/20 rounded-lg">
+                  <CubeIcon className="h-8 w-8 text-blue-400" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-white/60 text-sm">Low Stock Items</p>
+                  <p className="text-3xl font-bold text-white mt-2">{summary.lowStockItems}</p>
+                </div>
+                <div className="p-3 bg-yellow-500/20 rounded-lg">
+                  <ExclamationTriangleIcon className="h-8 w-8 text-yellow-400" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-white/60 text-sm">Stock Value</p>
+                  <p className="text-3xl font-bold text-green-400 mt-2">{formatCurrency(summary.totalValue)}</p>
+                </div>
+                <div className="p-3 bg-green-500/20 rounded-lg">
+                  <ScaleIcon className="h-8 w-8 text-green-400" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-white/60 text-sm">Production Stats</p>
+                  <p className="text-3xl font-bold text-orange-400 mt-2">{formatNumber(summary.totalProductionQty)}</p>
+                  <p className="text-white/40 text-xs">Raw Used: {formatNumber(summary.totalRawConsumed)}</p>
+                </div>
+                <div className="p-3 bg-orange-500/20 rounded-lg">
+                  <BeakerIcon className="h-8 w-8 text-orange-400" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Search and Tabs */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-between mb-6">
+            <div className="relative flex-1 max-w-md">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/50" />
+              <input
+                type="text"
+                placeholder="Search by name, code, or location..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 
+                  rounded-lg text-white placeholder-white/50
+                  focus:outline-none focus:ring-2 focus:ring-pink-500"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => setActiveTab('all')}
+                className={`px-4 py-2 rounded-lg transition-all duration-200 ${
+                  activeTab === 'all' 
+                    ? 'bg-pink-500 text-white' 
+                    : 'bg-white/10 text-white/70 hover:bg-white/20'
+                }`}
+              >
+                All Items
+              </button>
+              <button
+                onClick={() => setActiveTab('raw')}
+                className={`px-4 py-2 rounded-lg transition-all duration-200 ${
+                  activeTab === 'raw' 
+                    ? 'bg-blue-500 text-white' 
+                    : 'bg-white/10 text-white/70 hover:bg-white/20'
+                }`}
+              >
+                Raw Materials
+              </button>
+              <button
+                onClick={() => setActiveTab('finished')}
+                className={`px-4 py-2 rounded-lg transition-all duration-200 ${
+                  activeTab === 'finished' 
+                    ? 'bg-green-500 text-white' 
+                    : 'bg-white/10 text-white/70 hover:bg-white/20'
+                }`}
+              >
+                Finished Goods
+              </button>
+            </div>
+          </div>
+
+          {/* Raw Materials Table */}
+          {(activeTab === 'all' || activeTab === 'raw') && (
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <CubeIcon className="h-5 w-5 text-blue-400" />
+                Raw Materials
+              </h2>
+              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-white/5">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-white/60">Code</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-white/60">Name</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-white/60">Unit</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-white/60">Current Stock</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-white/60">Min Stock</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-white/60">Max Stock</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-white/60">Rate</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-white/60">Stock Value</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-white/60">Location</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-white/60">Status</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-white/60">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/10">
+                        <tr key={item.id} className="hover:bg-white/5 transition-colors">{filteredRawMaterials.map((item) => (
+                        <tr key={item.id} className="hover:bg-white/5 transition-colors">
+                          <td className="px-4 py-3 text-sm text-white font-mono">{item.code || `RM${item.id}`}</td>
+                          <td className="px-4 py-3 text-sm text-white">{item.name}</td>
+                          <td className="px-4 py-3 text-sm text-white/70">{item.unit || 'KG'}</td>
+                          <td className={`px-4 py-3 text-sm text-right font-semibold ${
+                            item.current_stock <= item.min_stock ? 'text-red-400' : 'text-white'
+                          }`}>
+                            {formatNumber(item.current_stock)}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-white/70 text-right">{item.min_stock || 0}</td>
+                          <td className="px-4 py-3 text-sm text-white/70 text-right">{item.max_stock || 0}</td>
+                          <td className="px-4 py-3 text-sm text-green-400 text-right">{formatCurrency(item.purchase_rate)}</td>
+                          <td className="px-4 py-3 text-sm text-green-400 text-right">{formatCurrency(item.stock_value)}</td>
+                          <td className="px-4 py-3 text-sm text-white/70">{item.location || '-'}</td>
+                          <td className="px-4 py-3 text-sm">
+                            <span className={`px-2 py-1 rounded-full text-xs border ${getStatusColor(item.alert_level)} flex items-center gap-1 w-fit`}>
+                              {getStatusIcon(item.alert_level)}
+                              {item.alert_level || 'Good'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-center">
+                            <button
+                              onClick={() => handleEditItem({...item, type: 'raw_material'})}
+                              className="text-blue-400 hover:text-blue-300 transition-colors mx-1"
+                              title="Edit Item"
+                            >
+                              <PencilIcon className="h-5 w-5 inline" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                
+                {filteredRawMaterials.length === 0 && (
+                  <div className="text-center py-8">
+                    <p className="text-white/50">No raw materials found</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Finished Goods Table */}
+          {(activeTab === 'all' || activeTab === 'finished') && (
+            <div>
+              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                <CubeIcon className="h-5 w-5 text-green-400" />
+                Finished Goods
+              </h2>
+              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-white/5">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-white/60">Code</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-white/60">Name</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-white/60">Unit</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-white/60">Current Stock</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-white/60">Min Stock</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-white/60">Max Stock</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-white/60">Sales Rate</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-white/60">MRP</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-white/60">Stock Value</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-white/60">Can Produce</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-white/60">Limiting Material</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-white/60">Location</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-white/60">Status</th>
+                        <th className="px-4 py-3 text-center text-xs font-medium text-white/60">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/10">
+                      {filteredFinishedGoods.map((item) => {
+                        const capacity = calculateProductionCapacity(item)
+                        
+                        return (
+                          <tr key={item.id} className="hover:bg-white/5 transition-colors">
+                            <td className="px-4 py-3 text-sm text-white font-mono">{item.code || `FG${item.id}`}</td>
+                            <td className="px-4 py-3 text-sm text-white">{item.name}</td>
+                            <td className="px-4 py-3 text-sm text-white/70">{item.unit || 'PCS'}</td>
+                            <td className={`px-4 py-3 text-sm text-right font-semibold ${
+                              item.current_stock <= item.min_stock ? 'text-red-400' : 'text-white'
+                            }`}>
+                              {formatNumber(item.current_stock)}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-white/70 text-right">{item.min_stock || 0}</td>
+                            <td className="px-4 py-3 text-sm text-white/70 text-right">{item.max_stock || 0}</td>
+                            <td className="px-4 py-3 text-sm text-green-400 text-right">{formatCurrency(item.sales_rate)}</td>
+                            <td className="px-4 py-3 text-sm text-purple-400 text-right">{formatCurrency(item.mrp)}</td>
+                            <td className="px-4 py-3 text-sm text-green-400 text-right">{formatCurrency(item.stock_value)}</td>
+                            <td className="px-4 py-3 text-sm text-blue-400 text-right font-bold">
+                              {capacity.possible > 0 ? formatNumber(capacity.possible) : '-'}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-white/70">
+                              {capacity.limiting || '-'}
+                              {capacity.possible > 0 && (
+                                <button
+                                  onClick={() => handleViewProduction(item)}
+                                  className="ml-2 text-blue-400 hover:text-blue-300"
+                                  title="View Production Details"
+                                >
+                                  <InformationCircleIcon className="h-4 w-4 inline" />
+                                </button>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-white/70">{item.location || '-'}</td>
+                            <td className="px-4 py-3 text-sm">
+                              <span className={`px-2 py-1 rounded-full text-xs border ${getStatusColor(item.alert_level)} flex items-center gap-1 w-fit`}>
+                                {getStatusIcon(item.alert_level)}
+                                {item.alert_level || 'Good'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-center">
+                              <button
+                                onClick={() => handleEditItem({...item, type: 'finished_good'})}
+                                className="text-blue-400 hover:text-blue-300 transition-colors mx-1"
+                                title="Edit Item"
+                              >
+                                <PencilIcon className="h-5 w-5 inline" />
+                              </button>
+                              <button
+                                onClick={() => handleViewProduction(item)}
+                                className="text-purple-400 hover:text-purple-300 transition-colors mx-1"
+                                title="View Production Details"
+                              >
+                                <EyeIcon className="h-5 w-5 inline" />
+                              </button>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                
+                {filteredFinishedGoods.length === 0 && (
+                  <div className="text-center py-8">
+                    <p className="text-white/50">No finished goods found</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Production Details Modal - Keep as is */}
+          {/* ... */}
+        </main>
+      </div>
+    </div>
+  )
+}

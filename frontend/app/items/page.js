@@ -1,0 +1,657 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import axios from 'axios'
+import toast from 'react-hot-toast'
+import {
+  PencilIcon,
+  TrashIcon,
+  PlusIcon,
+  MagnifyingGlassIcon,
+  CubeIcon,
+  BeakerIcon,
+  ChevronDownIcon
+} from '@heroicons/react/24/outline'
+
+export default function ItemsPage() {
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+  const [editingItem, setEditingItem] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterType, setFilterType] = useState('all') // 'all', 'raw_material', 'finished_good'
+  const [formData, setFormData] = useState({
+    item_type: 'raw_material',
+    name: '',
+    category: '',
+    unit: 'KG',
+    hsn_code: '',
+    gst_rate: 18,
+    purchase_rate: 0,
+    sales_rate: 0,
+    mrp: 0,
+    opening_stock: 0,
+    current_stock: 0,
+    min_stock: 0,
+    max_stock: 0,
+    location: ''
+  })
+
+  const router = useRouter()
+
+  useEffect(() => {
+    checkAuth()
+    fetchItems()
+  }, [filterType])
+
+  const checkAuth = () => {
+    const user = typeof window !== 'undefined' ? localStorage.getItem('user') : null
+    if (!user) {
+      router.push('/')
+    }
+  }
+
+  const fetchItems = async () => {
+    try {
+      const url = filterType === 'all' 
+        ? '/api/items/'
+        : `/api/items/?type=${filterType}`
+      
+      const response = await axios.get(url)
+      console.log('📦 Items API Response:', response.data)
+      setItems(response.data)
+    } catch (error) {
+      toast.error('Failed to fetch items')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleInputChange = (e) => {
+    const { name, value, type } = e.target
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: type === 'number' ? parseFloat(value) || 0 : value 
+    }))
+  }
+
+  const handleTypeChange = (e) => {
+    const newType = e.target.value
+    setFormData(prev => ({
+      ...prev,
+      item_type: newType,
+      unit: newType === 'raw_material' ? 'KG' : 'PCS',
+      purchase_rate: newType === 'raw_material' ? prev.purchase_rate : 0,
+      sales_rate: newType === 'finished_good' ? prev.sales_rate : 0,
+      mrp: newType === 'finished_good' ? prev.mrp : 0
+    }))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    
+    try {
+      console.log('📤 Submitting item data:', formData)
+      
+      // Prepare payload with all fields
+      const payload = {
+        ...formData,
+        gst_rate: parseFloat(formData.gst_rate) || 18,
+        purchase_rate: parseFloat(formData.purchase_rate) || 0,
+        sales_rate: parseFloat(formData.sales_rate) || 0,
+        mrp: parseFloat(formData.mrp) || 0,
+        opening_stock: parseFloat(formData.opening_stock) || 0,
+        current_stock: parseFloat(formData.current_stock) || 0,
+        min_stock: parseFloat(formData.min_stock) || 0,
+        max_stock: parseFloat(formData.max_stock) || 0
+      }
+      
+      if (editingItem) {
+        // Update
+        const response = await axios.put(
+          `/api/items/${editingItem.item_type}/${editingItem.id}`,
+          payload
+        )
+        console.log('✅ Update response:', response.data)
+        toast.success('Item updated successfully')
+      } else {
+        // Create
+        const response = await axios.post('/api/items', payload)
+        console.log('✅ Create response:', response.data)
+        toast.success('Item added successfully')
+      }
+      
+      setShowModal(false)
+      resetForm()
+      fetchItems()
+    } catch (error) {
+      console.error('❌ Error:', error)
+      toast.error('Operation failed: ' + (error.response?.data?.error || error.message))
+    }
+  }
+
+  const handleEdit = (item) => {
+    console.log('🖊️ Editing item:', item)
+    console.log('📊 Opening Stock from API:', item.opening_stock)
+    console.log('📊 Current Stock from API:', item.current_stock)
+    
+    setEditingItem(item)
+    setFormData({
+      item_type: item.item_type,
+      name: item.name || '',
+      category: item.category || '',
+      unit: item.unit || (item.item_type === 'raw_material' ? 'KG' : 'PCS'),
+      hsn_code: item.hsn_code || '',
+      gst_rate: item.gst_rate || 18,
+      purchase_rate: item.purchase_rate || 0,
+      sales_rate: item.sales_rate || 0,
+      mrp: item.mrp || 0,
+      opening_stock: item.opening_stock !== undefined ? parseFloat(item.opening_stock) : 0,
+      current_stock: item.current_stock !== undefined ? parseFloat(item.current_stock) : 0,
+      min_stock: item.min_stock !== undefined ? parseFloat(item.min_stock) : 0,
+      max_stock: item.max_stock !== undefined ? parseFloat(item.max_stock) : 0,
+      location: item.location || ''
+    })
+    setShowModal(true)
+  }
+
+  const handleDelete = async (item) => {
+    if (confirm(`Are you sure you want to delete this ${item.item_type === 'raw_material' ? 'raw material' : 'finished good'}?`)) {
+      try {
+        await axios.delete(`/api/items/${item.item_type}/${item.id}`)
+        toast.success('Item deleted successfully')
+        fetchItems()
+      } catch (error) {
+        toast.error('Delete failed')
+      }
+    }
+  }
+
+  const resetForm = () => {
+    setEditingItem(null)
+    setFormData({
+      item_type: 'raw_material',
+      name: '',
+      category: '',
+      unit: 'KG',
+      hsn_code: '',
+      gst_rate: 18,
+      purchase_rate: 0,
+      sales_rate: 0,
+      mrp: 0,
+      opening_stock: 0,
+      current_stock: 0,
+      min_stock: 0,
+      max_stock: 0,
+      location: ''
+    })
+  }
+
+  const filteredItems = items.filter(item =>
+    item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.hsn_code?.includes(searchTerm) ||
+    item.location?.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0
+    }).format(amount)
+  }
+
+  const getStockStatus = (current, min) => {
+    if (current <= 0) return 'text-red-400'
+    if (current <= min) return 'text-yellow-400'
+    return 'text-green-400'
+  }
+
+  const getTypeBadge = (type) => {
+    return type === 'raw_material' 
+      ? <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs">Raw Material</span>
+      : <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs">Finished Good</span>
+  }
+
+  return (
+    <div className="min-h-screen">
+      {/* Background */}
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
+      
+      {/* Content */}
+      <div className="relative">
+        {/* Header */}
+        <header className="bg-white/10 backdrop-blur-xl border-b border-white/20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <CubeIcon className="h-8 w-8 text-pink-400" />
+                <h1 className="text-2xl font-bold text-white">
+                  ITEM MASTER
+                </h1>
+              </div>
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="px-4 py-2 bg-white/10 border border-white/20  rounded-lg text-white hover:bg-white/20 transition-all duration-200"
+              >
+                ← Back to Dashboard
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Actions Bar */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-between mb-6">
+            {/* Search */}
+            <div className="relative flex-1 max-w-md">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/50" />
+              <input
+                type="text"
+                placeholder="Search items by name, code, HSN..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20  rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-500"
+              />
+            </div>
+            
+            {/* Filter Tabs */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setFilterType('all')}
+                className={`px-4 py-2 rounded-lg transition-all duration-200 ${
+                  filterType === 'all' 
+                    ? 'bg-pink-500 text-white' 
+                    : 'bg-white/10 text-white/70 hover:bg-white/20'
+                }`}
+              >
+                All Items
+              </button>
+              <button
+                onClick={() => setFilterType('raw_material')}
+                className={`px-4 py-2 rounded-lg transition-all duration-200 ${
+                  filterType === 'raw_material' 
+                    ? 'bg-blue-500 text-white' 
+                    : 'bg-white/10 text-white/70 hover:bg-white/20'
+                }`}
+              >
+                Raw Materials
+              </button>
+              <button
+                onClick={() => setFilterType('finished_good')}
+                className={`px-4 py-2 rounded-lg transition-all duration-200 ${
+                  filterType === 'finished_good' 
+                    ? 'bg-green-500 text-white' 
+                    : 'bg-white/10 text-white/70 hover:bg-white/20'
+                }`}
+              >
+                Finished Goods
+              </button>
+            </div>
+            
+            {/* Add Button */}
+            <button
+              onClick={() => {
+                resetForm()
+                setShowModal(true)
+              }}
+              className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 flex items-center justify-center gap-2"
+            >
+              <PlusIcon className="h-5 w-5" />
+              Add Item
+            </button>
+          </div>
+
+          {/* Items Table */}
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-white/5">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase">Type</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase">Code</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase">Item Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase">Unit</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase">HSN</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase">GST</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase">Rate</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase">Opening Stock</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase">Location</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase">Actions</th>
+                   </tr>
+                </thead>
+                <tbody className="divide-y divide-white/10">
+                  {filteredItems.map((item) => (
+                    <tr key={`${item.item_type}-${item.id}`} className="hover:bg-white/5 transition-colors">
+                      <td className="px-6 py-4 text-sm">
+                        {getTypeBadge(item.item_type)}
+                       </td>
+                      <td className="px-6 py-4 text-sm text-white font-mono">{item.code}</td>
+                      <td className="px-6 py-4 text-sm text-white font-medium">{item.name}</td>
+                      <td className="px-6 py-4 text-sm text-white/70">{item.unit}</td>
+                      <td className="px-6 py-4 text-sm text-white/70">{item.hsn_code}</td>
+                      <td className="px-6 py-4 text-sm text-white/70">{item.gst_rate}%</td>
+                      <td className="px-6 py-4 text-sm text-green-400">
+                        {item.item_type === 'raw_material' 
+                          ? formatCurrency(item.purchase_rate)
+                          : formatCurrency(item.sales_rate)}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-semibold">
+                        {item.opening_stock} {item.unit}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-white/70">{item.location}</td>
+                      <td className="px-6 py-4 text-sm">
+                        <button
+                          onClick={() => handleEdit(item)}
+                          className="text-blue-400 hover:text-blue-300 mr-3 transition-colors"
+                          title="Edit Item"
+                        >
+                          <PencilIcon className="h-5 w-5 inline" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item)}
+                          className="text-red-400 hover:text-red-300 transition-colors"
+                          title="Delete Item"
+                        >
+                          <TrashIcon className="h-5 w-5 inline" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Empty State */}
+            {filteredItems.length === 0 && (
+              <div className="text-center py-16">
+                <CubeIcon className="h-16 w-16 text-white/20 mx-auto mb-4" />
+                <p className="text-white/50 text-lg">No items found</p>
+                <p className="text-white/30 text-sm mt-2">Click "Add Item" to create your first item</p>
+              </div>
+            )}
+          </div>
+
+          {/* Summary Cards */}
+          {items.length > 0 && (
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-blue-500/20 backdrop-blur-xl border border-blue-500/30 rounded-xl p-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-300">Raw Materials:</span>
+                  <span className="text-white font-semibold">
+                    {items.filter(i => i.item_type === 'raw_material').length}
+                  </span>
+                </div>
+              </div>
+              <div className="bg-green-500/20 backdrop-blur-xl border border-green-500/30 rounded-xl p-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-green-300">Finished Goods:</span>
+                  <span className="text-white font-semibold">
+                    {items.filter(i => i.item_type === 'finished_good').length}
+                  </span>
+                </div>
+              </div>
+              <div className="bg-purple-500/20 backdrop-blur-xl border border-purple-500/30 rounded-xl p-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-purple-300">Total Items:</span>
+                  <span className="text-white font-semibold">{items.length}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* Item Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center gap-3 mb-4">
+              {formData.item_type === 'raw_material' ? (
+                <BeakerIcon className="h-6 w-6 text-blue-400" />
+              ) : (
+                <CubeIcon className="h-6 w-6 text-green-400" />
+              )}
+              <h2 className="text-xl font-semibold text-white">
+                {editingItem ? 'Edit Item' : 'Add New Item'}
+              </h2>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Item Type Selection */}
+                <div className="col-span-2">
+                  <label className="block text-white/80 text-sm mb-1">Item Type *</label>
+                  <div className="relative">
+                    <select
+                      name="item_type"
+                      value={formData.item_type}
+                      onChange={handleTypeChange}
+                      className="w-full px-3 py-2 bg-white/10 border border-white/20  rounded-lg text-white appearance-none focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      required
+                    >
+                      <option value="raw_material">Raw Material</option>
+                      <option value="finished_good">Finished Good</option>
+                    </select>
+                    <ChevronDownIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/50" />
+                  </div>
+                </div>
+
+                {/* Basic Information */}
+                <div className="col-span-2">
+                  <h3 className="text-white/80 text-sm font-semibold mb-2">Basic Information</h3>
+                </div>
+                
+                {/* Item Name */}
+                <div className="col-span-2">
+                  <label className="block text-white/80 text-sm mb-1">Item Name *</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-3 py-2 bg-white/10 border border-white/20  rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    placeholder={formData.item_type === 'raw_material' 
+                      ? "e.g., Plastic Granules - HDPE" 
+                      : "e.g., Plastic Chair - Premium"}
+                  />
+                </div>
+                
+                {/* Unit */}
+                <div>
+                  <label className="block text-white/80 text-sm mb-1">Unit *</label>
+                  <select
+                    name="unit"
+                    value={formData.unit}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-3 py-2 bg-white/10 border border-white/20  rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  >
+                    <option value="KG">Kilogram (KG)</option>
+                    <option value="PCS">Pieces (PCS)</option>
+                    <option value="MTR">Meter (MTR)</option>
+                    <option value="LTR">Liter (LTR)</option>
+                    <option value="BOX">Box</option>
+                  </select>
+                </div>
+                
+                {/* HSN Code */}
+                <div>
+                  <label className="block text-white/80 text-sm mb-1">HSN Code</label>
+                  <input
+                    type="text"
+                    name="hsn_code"
+                    value={formData.hsn_code}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 bg-white/10 border border-white/20  rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    placeholder="e.g., 39269099"
+                  />
+                </div>
+                
+                {/* GST Rate */}
+                <div>
+                  <label className="block text-white/80 text-sm mb-1">GST Rate (%)</label>
+                  <select
+                    name="gst_rate"
+                    value={formData.gst_rate}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 bg-white/10 border border-white/20  rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+                  >
+                    <option value="0">0%</option>
+                    <option value="5">5%</option>
+                    <option value="12">12%</option>
+                    <option value="18">18%</option>
+                    <option value="28">28%</option>
+                  </select>
+                </div>
+                
+                {/* Conditional Fields based on Item Type */}
+                {formData.item_type === 'raw_material' ? (
+                  // Raw Material Fields
+                  <div>
+                    <label className="block text-white/80 text-sm mb-1">Purchase Rate (₹)</label>
+                    <input
+                      type="number"
+                      name="purchase_rate"
+                      value={formData.purchase_rate}
+                      onChange={handleInputChange}
+                      min="0"
+                      step="any"
+                      className="w-full px-3 py-2 bg-white/10 border border-white/20  rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      placeholder="0"
+                    />
+                  </div>
+                ) : (
+                  // Finished Good Fields
+                  <>
+                    <div>
+                      <label className="block text-white/80 text-sm mb-1">Sales Rate (₹)</label>
+                      <input
+                        type="number"
+                        name="sales_rate"
+                        value={formData.sales_rate}
+                        onChange={handleInputChange}
+                        min="0"
+                        step="any"
+                        className="w-full px-3 py-2 bg-white/10 border border-white/20  rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                        placeholder="0"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-white/80 text-sm mb-1">MRP (₹)</label>
+                      <input
+                        type="number"
+                        name="mrp"
+                        value={formData.mrp}
+                        onChange={handleInputChange}
+                        min="0"
+                        step="any"
+                        className="w-full px-3 py-2 bg-white/10 border border-white/20  rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                        placeholder="0"
+                      />
+                    </div>
+                  </>
+                )}
+                
+                {/* Stock Information */}
+                <div className="col-span-2 mt-4">
+                  <h3 className="text-white/80 text-sm font-semibold mb-2">Stock Information</h3>
+                </div>
+                
+                <div>
+                  <label className="block text-white/80 text-sm mb-1">Opening Stock</label>
+                  <input
+                    type="number"
+                    name="opening_stock"
+                    value={formData.opening_stock}
+                    onChange={handleInputChange}
+                    min="0"
+                    step="any"
+                    className="w-full px-3 py-2 bg-white/10 border border-white/20  rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    placeholder="0"
+                  />
+                  <p className="text-white/50 text-xs mt-1">Base stock quantity (editable)</p>
+                </div>
+                
+                <div>
+                  <label className="block text-white/80 text-sm mb-1">Current Stock</label>
+                  <input
+                    type="number"
+                    name="current_stock"
+                    value={formData.current_stock}
+                    disabled
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10  rounded-lg text-white/70 cursor-not-allowed"
+                    placeholder="0"
+                  />
+                  <p className="text-yellow-400/70 text-xs mt-1">⚠️ Auto-calculated from transactions. Read-only.</p>
+                </div>
+                
+                <div>
+                  <label className="block text-white/80 text-sm mb-1">Min Stock Level</label>
+                  <input
+                    type="number"
+                    name="min_stock"
+                    value={formData.min_stock}
+                    onChange={handleInputChange}
+                    min="0"
+                    step="any"
+                    className="w-full px-3 py-2 bg-white/10 border border-white/20  rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    placeholder="0"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-white/80 text-sm mb-1">Max Stock Level</label>
+                  <input
+                    type="number"
+                    name="max_stock"
+                    value={formData.max_stock}
+                    onChange={handleInputChange}
+                    min="0"
+                    step="any"
+                    className="w-full px-3 py-2 bg-white/10 border border-white/20  rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    placeholder="0"
+                  />
+                </div>
+                
+                {/* Location */}
+                <div className="col-span-2">
+                  <label className="block text-white/80 text-sm mb-1">Storage Location</label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 bg-white/10 border border-white/20  rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-pink-500"
+                    placeholder="e.g., Warehouse A, Rack 1"
+                  />
+                </div>
+              </div>
+              
+              {/* Form Actions */}
+              <div className="flex justify-end space-x-3 mt-6 pt-4 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-white/10 border border-white/20  rounded-lg text-white hover:bg-white/20 transition-all duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all duration-200 font-medium"
+                >
+                  {editingItem ? 'Update Item' : 'Save Item'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

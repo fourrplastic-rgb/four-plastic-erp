@@ -1,0 +1,122 @@
+//@version=5
+indicator("FinSight Liquidity Matrix (V2)", overlay=true, max_boxes_count=500, max_lines_count=500, max_labels_count=500)
+
+// ==========================================
+// 1. INPUTS & SETTINGS
+// ==========================================
+grp1 = "Macro Trend Filter (MTF)"
+useMTF = input.bool(true, title="Use Macro Trend Filter?", group=grp1)
+mtfTimeframe = input.timeframe("60", title="Macro Timeframe (Default: 1 Hour)", group=grp1)
+mtfEmaLen = input.int(50, title="Macro EMA Length", group=grp1)
+
+grp2 = "Liquidity & FVG Settings"
+pivotLen = input.int(10, title="Liquidity Pool Lookback", group=grp2)
+showFVG = input.bool(true, title="Draw Fair Value Gaps (FVG)", group=grp2)
+
+// ==========================================
+// 2. MACRO TREND FILTER (MTF)
+// ==========================================
+// Calculates the 50 EMA on the 1-Hour chart to ensure we only trade with the trend
+macroEma = request.security(syminfo.tickerid, mtfTimeframe, ta.ema(close, mtfEmaLen))
+isMacroBullish = not useMTF or (close > macroEma)
+isMacroBearish = not useMTF or (close < macroEma)
+
+// ==========================================
+// 3. FAIR VALUE GAPS (FVG)
+// ==========================================
+// A bullish FVG occurs when the low of candle 3 is higher than the high of candle 1
+isBullishFVG = low > high[2] and close[1] > open[1]
+// A bearish FVG occurs when the high of candle 3 is lower than the low of candle 1
+isBearishFVG = high < low[2] and close[1] < open[1]
+
+var box[] bullFvgBoxes = array.new_box()
+var box[] bearFvgBoxes = array.new_box()
+
+if isBullishFVG and showFVG
+    b = box.new(bar_index[2], high[2], bar_index + 10, low, border_color=color.new(color.lime, 80), bgcolor=color.new(color.lime, 90))
+    array.push(bullFvgBoxes, b)
+
+if isBearishFVG and showFVG
+    b = box.new(bar_index[2], low[2], bar_index + 10, high, border_color=color.new(color.red, 80), bgcolor=color.new(color.red, 90))
+    array.push(bearFvgBoxes, b)
+
+// Check if price is tapping into an FVG
+inBullFVG = false
+for i = 0 to (array.size(bullFvgBoxes) == 0 ? na : array.size(bullFvgBoxes) - 1)
+    if na(i)
+        break
+    bx = array.get(bullFvgBoxes, i)
+    if low <= box.get_top(bx) and close > box.get_bottom(bx)
+        inBullFVG := true
+        break
+
+inBearFVG = false
+for i = 0 to (array.size(bearFvgBoxes) == 0 ? na : array.size(bearFvgBoxes) - 1)
+    if na(i)
+        break
+    bx = array.get(bearFvgBoxes, i)
+    if high >= box.get_bottom(bx) and close < box.get_top(bx)
+        inBearFVG := true
+        break
+
+// ==========================================
+// 4. LIQUIDITY SWEEPS (STOP HUNTS)
+// ==========================================
+// Find Swing Highs and Lows (Liquidity Pools)
+ph = ta.pivothigh(high, pivotLen, pivotLen)
+pl = ta.pivotlow(low, pivotLen, pivotLen)
+
+var float liqHigh = na
+var float liqLow = na
+
+if not na(ph)
+    liqHigh := ph
+if not na(pl)
+    liqLow := pl
+
+// Detect a Sweep: Price wicks past the liquidity pool but CLOSES back inside
+bullishSweep = false
+bearishSweep = false
+
+if not na(liqLow) and low < liqLow and close > liqLow
+    bullishSweep := true
+    liqLow := na // Reset pool after it's swept
+
+if not na(liqHigh) and high > liqHigh and close < liqHigh
+    bearishSweep := true
+    liqHigh := na // Reset pool after it's swept
+
+if bullishSweep
+    label.new(bar_index, low, "L-SWEEP\n(Bull Trap)", color=color.new(color.green, 0), textcolor=color.white, style=label.style_label_up, size=size.small)
+if bearishSweep
+    label.new(bar_index, high, "L-SWEEP\n(Bear Trap)", color=color.new(color.red, 0), textcolor=color.white, style=label.style_label_down, size=size.small)
+
+// ==========================================
+// 5. THE LIQUIDITY MATRIX (SNIPER ENTRY)
+// ==========================================
+// LONG ENTRY: Macro trend is Bullish AND we either tap a Bullish FVG or sweep liquidity.
+sniperLong = isMacroBullish and (inBullFVG or bullishSweep) and close > open
+// SHORT ENTRY: Macro trend is Bearish AND we either tap a Bearish FVG or sweep liquidity.
+sniperShort = isMacroBearish and (inBearFVG or bearishSweep) and close < open
+
+// Only show the first signal in a cluster
+var bool inLong = false
+var bool inShort = false
+
+if sniperLong
+    inLong := true
+    inShort := false
+if sniperShort
+    inShort := true
+    inLong := false
+
+cleanLong = sniperLong and not inLong[1]
+cleanShort = sniperShort and not inShort[1]
+
+// Plot Sniper Entries
+plotshape(cleanLong, title="SNIPER LONG", style=shape.labelup, location=location.belowbar, color=color.lime, size=size.normal, text="SNIPER\nLONG", textcolor=color.black)
+plotshape(cleanShort, title="SNIPER SHORT", style=shape.labeldown, location=location.abovebar, color=color.red, size=size.normal, text="SNIPER\nSHORT", textcolor=color.white)
+
+// Background Pulse on Sniper Signal
+bgcolor(cleanLong ? color.new(color.lime, 85) : na, title="Buy Pulse")
+bgcolor(cleanShort ? color.new(color.red, 85) : na, title="Sell Pulse")
