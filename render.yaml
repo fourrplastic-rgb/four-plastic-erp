@@ -5,10 +5,8 @@ services:
     plan: free
     env: python
     buildCommand: pip install -r backend/requirements.txt
-    startCommand: cd backend && gunicorn app:app
+    startCommand: cd backend && gunicorn -b 0.0.0.0:$PORT app:app
     envVars:
-      - key: PORT
-        value: 5001
       - key: PYTHON_VERSION
         value: 3.9.0
       - key: SUPABASE_URL
