@@ -50,11 +50,13 @@ function PrintReportContent() {
       let challansData = response.data
       
       for (let i = 0; i < challansData.length; i++) {
-        try {
-          const challanDetail = await axios.get(`${API_BASE_URL}/delivery-challans/${challansData[i].id}`)
-          challansData[i].items = challanDetail.data.items || []
-        } catch (e) {
-          challansData[i].items = []
+        if (!challansData[i].items || !Array.isArray(challansData[i].items)) {
+          try {
+            const challanDetail = await axios.get(`${API_BASE_URL}/delivery-challans/${challansData[i].id}`)
+            challansData[i].items = challanDetail.data.items || []
+          } catch (e) {
+            challansData[i].items = []
+          }
         }
       }
       

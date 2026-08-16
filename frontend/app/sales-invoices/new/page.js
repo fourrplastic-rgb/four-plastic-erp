@@ -146,15 +146,17 @@ export default function NewSalesInvoice() {
       let challansData = response.data || []
       
       for (let i = 0; i < challansData.length; i++) {
-        try {
-          const challanDetail = await axios.get(`/api/delivery-challans/${challansData[i].id}`)
-          challansData[i].items = challanDetail.data.items || []
-          if (customersMap[challansData[i].customer_id]) {
-            challansData[i].customer_name = customersMap[challansData[i].customer_id]
+        if (!challansData[i].items || !Array.isArray(challansData[i].items)) {
+          try {
+            const challanDetail = await axios.get(`/api/delivery-challans/${challansData[i].id}`)
+            challansData[i].items = challanDetail.data.items || []
+          } catch (err) {
+            console.error(`Error fetching items for challan ${challansData[i].id}:`, err)
+            challansData[i].items = []
           }
-        } catch (err) {
-          console.error(`Error fetching items for challan ${challansData[i].id}:`, err)
-          challansData[i].items = []
+        }
+        if (customersMap[challansData[i].customer_id]) {
+          challansData[i].customer_name = customersMap[challansData[i].customer_id]
         }
       }
       
