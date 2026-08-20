@@ -64,6 +64,16 @@ def upload_db():
         return False
 
     try:
+        # Run WAL checkpoint to merge changes from .db-wal file into manufacturing.db
+        import sqlite3
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+            conn.close()
+            print("🔄 SQLite database checkpointed and WAL truncated successfully.")
+        except Exception as checkpoint_error:
+            print(f"⚠️ SQLite checkpoint failed: {checkpoint_error}")
+
         print(f"📤 Uploading database to cloud storage...")
         # Upload with overwrite option enabled (upsert=True)
         with open(DB_PATH, "rb") as f:
