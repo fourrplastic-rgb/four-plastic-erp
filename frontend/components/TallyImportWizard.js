@@ -2204,7 +2204,7 @@ export default function TallyImportWizard({ isOpen, onClose, onImportSuccess, de
                   </div>
 
                   <div className="pt-2 text-center text-white/40 text-[10px] font-medium tracking-wide">
-                    Please click "Confirm & Import Invoice" below to save.
+                    Please click &quot;Confirm &amp; Import Invoice&quot; below to save.
                   </div>
                 </div>
               </div>

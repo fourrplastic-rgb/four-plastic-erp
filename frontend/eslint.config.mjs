@@ -12,6 +12,13 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "next.config.js",
+    "next.config.ts",
+    "debug_login.js",
+    "test_login.js",
+    "test_dashboard_api.js",
+    "**/*.save",
+    "**/*.save.js",
   ]),
 ]);
 

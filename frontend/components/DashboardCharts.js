@@ -16,6 +16,42 @@ import {
 
 const COLORS = ['#06b6d4', '#a855f7', '#fbbf24', '#f43f5e', '#3b82f6'];
 
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0
+  }).format(value);
+};
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-black/90 border border-white/20 p-4 rounded-lg shadow-xl backdrop-blur-md">
+        <p className="text-white font-semibold mb-2">{label}</p>
+        {payload.map((entry, index) => (
+          <p key={index} style={{ color: entry.color }} className="text-sm font-medium">
+            {entry.name}: {formatCurrency(entry.value)}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
+const PieTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-black/90 border border-white/20 p-4 rounded-lg shadow-xl backdrop-blur-md">
+        <p className="text-white font-semibold">{payload[0].name}</p>
+        <p className="text-white/90 text-sm mt-1 font-semibold">{formatCurrency(payload[0].value)}</p>
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function DashboardCharts({ chartData }) {
   const [mounted, setMounted] = React.useState(false);
 
@@ -34,41 +70,6 @@ export default function DashboardCharts({ chartData }) {
 
   const { monthly_revenue = [], top_customers = [] } = chartData;
 
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(value);
-  };
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-black/90 border border-white/20 p-4 rounded-lg shadow-xl backdrop-blur-md">
-          <p className="text-white font-semibold mb-2">{label}</p>
-          {payload.map((entry, index) => (
-            <p key={index} style={{ color: entry.color }} className="text-sm font-medium">
-              {entry.name}: {formatCurrency(entry.value)}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
-
-  const PieTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-black/90 border border-white/20 p-4 rounded-lg shadow-xl backdrop-blur-md">
-          <p className="text-white font-semibold">{payload[0].name}</p>
-          <p className="text-white/90 text-sm mt-1 font-semibold">{formatCurrency(payload[0].value)}</p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -37,7 +37,7 @@ export default function BarcodeScanner({ onScanSuccess, buttonText = "Scan Item"
     }
   }, [isOpen, onScanSuccess])
 
-  const closeScanner = () => {
+  function closeScanner() {
     if (scannerRef.current) {
       scannerRef.current.clear().catch(error => console.error("Failed to clear scanner", error))
       scannerRef.current = null

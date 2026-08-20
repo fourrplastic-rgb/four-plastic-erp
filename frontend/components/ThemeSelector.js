@@ -16,17 +16,19 @@ const themes = [
 ]
 
 export default function ThemeSelector() {
-  const [currentTheme, setCurrentTheme] = useState('theme-lavender')
+  const [currentTheme, setCurrentTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('erp-theme') || 'theme-lavender'
+    }
+    return 'theme-lavender'
+  })
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('erp-theme') || 'theme-lavender'
-    setCurrentTheme(savedTheme)
-    
     // Apply class to documentElement
     const doc = document.documentElement
     themes.forEach(t => doc.classList.remove(t.id))
-    doc.classList.add(savedTheme)
+    doc.classList.add(currentTheme)
   }, [])
 
   const changeTheme = (themeId) => {

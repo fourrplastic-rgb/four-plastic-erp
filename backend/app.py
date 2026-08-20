@@ -294,4 +294,4 @@ if __name__ == '__main__':
     print("⚠️  Frontend runs on http://localhost:3000")
     print("="*70 + "\n")
     
-    app.run(debug=True, port=5001, host='::')
+    app.run(debug=True, port=5001, host='0.0.0.0')
