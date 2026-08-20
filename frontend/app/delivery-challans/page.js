@@ -19,6 +19,7 @@ import {
   CheckCircleIcon,
   DocumentTextIcon
 } from '@heroicons/react/24/outline'
+import { useFinancialYear } from '@/context/FinancialYearContext'
 
 // API Base URL constant
 const API_BASE_URL = '/api'
@@ -45,6 +46,15 @@ export default function DeliveryChallansPage() {
 
   // State for filtered total quantity
   const [filteredTotalQty, setFilteredTotalQty] = useState(0)
+
+  const { selectedYear: activeFY } = useFinancialYear()
+
+  useEffect(() => {
+    if (activeFY) {
+      setFromDate(activeFY.start_date)
+      setToDate(activeFY.end_date)
+    }
+  }, [activeFY])
 
   useEffect(() => {
     checkAuth()
@@ -268,8 +278,13 @@ export default function DeliveryChallansPage() {
   const clearFilters = () => {
     setSearchTerm('')
     setStatusFilter('all')
-    setFromDate('')
-    setToDate('')
+    if (activeFY) {
+      setFromDate(activeFY.start_date)
+      setToDate(activeFY.end_date)
+    } else {
+      setFromDate('')
+      setToDate('')
+    }
   }
 
   const formatDate = (dateString) => {

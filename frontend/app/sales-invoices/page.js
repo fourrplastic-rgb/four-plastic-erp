@@ -18,6 +18,7 @@ import {
   ArrowPathIcon,
   DocumentArrowDownIcon
 } from '@heroicons/react/24/outline'
+import { useFinancialYear } from '@/context/FinancialYearContext'
 
 // API Base URL constant
 const API_BASE_URL = '/api'
@@ -50,6 +51,16 @@ export default function SalesInvoicesPage() {
   })
 
   const router = useRouter()
+  const { selectedYear: activeFY } = useFinancialYear()
+
+  useEffect(() => {
+    if (activeFY) {
+      setDateRange({
+        from_date: activeFY.start_date,
+        to_date: activeFY.end_date
+      })
+    }
+  }, [activeFY])
 
   useEffect(() => {
     checkAuth()
@@ -177,7 +188,11 @@ export default function SalesInvoicesPage() {
     setSelectedYear('all')
     setSelectedMonth('all')
     setShowCustomDate(false)
-    setDateRange({ from_date: '', to_date: '' })
+    if (activeFY) {
+      setDateRange({ from_date: activeFY.start_date, to_date: activeFY.end_date })
+    } else {
+      setDateRange({ from_date: '', to_date: '' })
+    }
   }
 
   const handleExportExcel = () => {
