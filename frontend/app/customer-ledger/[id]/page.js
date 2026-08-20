@@ -427,35 +427,30 @@ export default function CustomerLedgerPage() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td style="white-space: nowrap;">${formatDate(dateRange.from_date)}</td>
-              <td><span class="type-badge opening">OPENING</span></td>
-              <td><div class="ref-text">-</div></td>
-              <td>Opening Balance</td>
-              <td class="text-right">-</td>
-              <td class="text-right">-</td>
-              <td class="text-right balance-val">${formatCurrency(ledger?.customer?.opening_balance || 0)}</td>
-            </tr>
             ${filteredTransactions.map(trans => {
-              let descriptionHtml = ''
+              let itemsHtml = ''
+              let qtyHtml = ''
+              let rateHtml = ''
+              
               if (trans.transaction_type === 'SALES' && trans.items && trans.items.length > 0) {
-                descriptionHtml = trans.items.map(item => {
-                  const qty = Number(item.quantity) || 0
-                  const rate = Number(item.rate) || 0
-                  const amount = qty * rate
-                  return '<div class="item-line"><strong>' + item.item_name + '</strong> &bull; ' + qty + ' &times; ' + formatCurrency(rate) + ' = ' + formatCurrency(amount) + '</div>'
-                }).join('')
+                itemsHtml = trans.items.map(item => `<div class="item-line"><strong>${item.item_name || item.name || ''}</strong></div>`).join('')
+                qtyHtml = trans.items.map(item => `<div class="item-line">${item.quantity || item.qty || 0} ${item.unit || ''}</div>`).join('')
+                rateHtml = trans.items.map(item => `<div class="item-line">${formatCurrency(item.rate || 0)}</div>`).join('')
               } else {
-                descriptionHtml = (trans.description || '-')
+                itemsHtml = `<div class="item-line">${trans.description || '-'}</div>`
+                qtyHtml = `<div class="item-line">-</div>`
+                rateHtml = `<div class="item-line">-</div>`
               }
               
-              const badgeClass = trans.transaction_type === 'SALES' ? 'sales' : trans.transaction_type === 'PAYMENT' ? 'payment' : '';
+              const badgeClass = trans.transaction_type === 'SALES' ? 'sales' : trans.transaction_type === 'PAYMENT' ? 'payment' : 'opening';
               
               return '<tr>' +
                 '<td style="white-space: nowrap;">' + formatDate(trans.transaction_date) + '</td>' +
                 '<td><span class="type-badge ' + badgeClass + '">' + trans.transaction_type + '</span></td>' +
                 '<td><div class="ref-text">' + (trans.reference_no || '-') + '</div></td>' +
-                '<td>' + descriptionHtml + '</td>' +
+                '<td>' + itemsHtml + '</td>' +
+                '<td class="text-right">' + qtyHtml + '</td>' +
+                '<td class="text-right">' + rateHtml + '</td>' +
                 '<td class="text-right debit">' + (trans.debit != null && trans.debit !== 0 ? formatCurrency(trans.debit) : '-') + '</td>' +
                 '<td class="text-right credit">' + (trans.credit != null && trans.credit !== 0 ? formatCurrency(trans.credit) : '-') + '</td>' +
                 '<td class="text-right balance-val">' + formatCurrency(trans.balance) + '</td>' +

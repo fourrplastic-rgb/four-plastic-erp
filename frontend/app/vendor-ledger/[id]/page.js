@@ -452,6 +452,8 @@ export default function VendorLedgerPage() {
               <th>Type</th>
               <th>Reference</th>
               <th>Description / Items</th>
+              <th class="text-right">Qty</th>
+              <th class="text-right">Rate</th>
               <th class="text-right">Debit</th>
               <th class="text-right">Credit</th>
               <th class="text-right">Balance</th>
