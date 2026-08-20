@@ -53,12 +53,35 @@ export default function SalesInvoicesPage() {
   const router = useRouter()
   const { selectedYear: activeFY } = useFinancialYear()
 
+  const getDefaultDateRange = (fy) => {
+    if (!fy) return { from_date: '', to_date: '' }
+    const today = new Date()
+    const todayStr = today.toISOString().split('T')[0]
+    const fyStart = new Date(fy.start_date)
+    const fyEnd = new Date(fy.end_date)
+    
+    if (today >= fyStart && today <= fyEnd) {
+      const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+      const yyyy = currentMonthStart.getFullYear()
+      const mm = String(currentMonthStart.getMonth() + 1).padStart(2, '0')
+      return {
+        from_date: `${yyyy}-${mm}-01`,
+        to_date: todayStr
+      }
+    } else {
+      const fyStartMonth = fyStart.getMonth()
+      const fyStartYear = fyStart.getFullYear()
+      const lastDayOfStartMonth = new Date(fyStartYear, fyStartMonth + 1, 0).getDate()
+      return {
+        from_date: `${fyStartYear}-${String(fyStartMonth + 1).padStart(2, '0')}-01`,
+        to_date: `${fyStartYear}-${String(fyStartMonth + 1).padStart(2, '0')}-${String(lastDayOfStartMonth).padStart(2, '0')}`
+      }
+    }
+  }
+
   useEffect(() => {
     if (activeFY) {
-      setDateRange({
-        from_date: activeFY.start_date,
-        to_date: activeFY.end_date
-      })
+      setDateRange(getDefaultDateRange(activeFY))
     }
   }, [activeFY])
 
@@ -188,11 +211,7 @@ export default function SalesInvoicesPage() {
     setSelectedYear('all')
     setSelectedMonth('all')
     setShowCustomDate(false)
-    if (activeFY) {
-      setDateRange({ from_date: activeFY.start_date, to_date: activeFY.end_date })
-    } else {
-      setDateRange({ from_date: '', to_date: '' })
-    }
+    setDateRange(getDefaultDateRange(activeFY))
   }
 
   const handleExportExcel = () => {

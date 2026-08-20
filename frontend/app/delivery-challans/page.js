@@ -49,10 +49,37 @@ export default function DeliveryChallansPage() {
 
   const { selectedYear: activeFY } = useFinancialYear()
 
+  const getDefaultDateRange = (fy) => {
+    if (!fy) return { from_date: '', to_date: '' }
+    const today = new Date()
+    const todayStr = today.toISOString().split('T')[0]
+    const fyStart = new Date(fy.start_date)
+    const fyEnd = new Date(fy.end_date)
+    
+    if (today >= fyStart && today <= fyEnd) {
+      const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+      const yyyy = currentMonthStart.getFullYear()
+      const mm = String(currentMonthStart.getMonth() + 1).padStart(2, '0')
+      return {
+        from_date: `${yyyy}-${mm}-01`,
+        to_date: todayStr
+      }
+    } else {
+      const fyStartMonth = fyStart.getMonth()
+      const fyStartYear = fyStart.getFullYear()
+      const lastDayOfStartMonth = new Date(fyStartYear, fyStartMonth + 1, 0).getDate()
+      return {
+        from_date: `${fyStartYear}-${String(fyStartMonth + 1).padStart(2, '0')}-01`,
+        to_date: `${fyStartYear}-${String(fyStartMonth + 1).padStart(2, '0')}-${String(lastDayOfStartMonth).padStart(2, '0')}`
+      }
+    }
+  }
+
   useEffect(() => {
     if (activeFY) {
-      setFromDate(activeFY.start_date)
-      setToDate(activeFY.end_date)
+      const { from_date, to_date } = getDefaultDateRange(activeFY)
+      setFromDate(from_date)
+      setToDate(to_date)
     }
   }, [activeFY])
 
@@ -278,13 +305,9 @@ export default function DeliveryChallansPage() {
   const clearFilters = () => {
     setSearchTerm('')
     setStatusFilter('all')
-    if (activeFY) {
-      setFromDate(activeFY.start_date)
-      setToDate(activeFY.end_date)
-    } else {
-      setFromDate('')
-      setToDate('')
-    }
+    const { from_date, to_date } = getDefaultDateRange(activeFY)
+    setFromDate(from_date)
+    setToDate(to_date)
   }
 
   const formatDate = (dateString) => {
